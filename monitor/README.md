@@ -29,6 +29,7 @@ inspiració:
 * Ratio inspiració/espiració (1:x) típicament entre 1:1 1:2
 * Pressió al final espiració (cm H2O)
 
+El periode de mostreig hauria de ser 20ms (màxim 60 ms)
 
 Fa un paquet amb identificador del dispositiu i  ABC,T,max,plateau,ratio,peep i l'envia per UDP
 
@@ -47,8 +48,9 @@ Funcionalitat recollida de dades
 
 Processat per calcular
 
-Configuració: Cada trasto s'ha de connectar a un PC i se li pot donar el identificador ABC. Això s'ha 
-de poder fer "en el camp"
+Configuració: Abans de posar-lo en servei, cada trasto s'ha de connectar momentàniament 
+a un PC per programar-lo amb identificador ABC que vulguin. Això s'ha 
+de poder fer "en el camp".
 
 
 ## Core Raspberry
@@ -67,9 +69,15 @@ Rebre paquets UDP
 
 Guardar-los. Un fitxer CSV per cada hora i per cada respirador
 
-Presentació gràfiques en temps real
+Presentació d'informació en temps real. Mode text
+
+Presentació de gràfiques en temps real. Mode gràfic
 
 Si apapreix un nou dispositiu, genera gràfica nova
+
+Alarmes configurables. Interfície d'usuari simple
+
+Timer de canvi de filtre. Alarma. Interfície d'usuari
 
 
 
