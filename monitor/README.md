@@ -23,18 +23,20 @@ Llegeix regularment dades analógiques. En fa un processat intern i envia dades 
 inspiració: 
 
 * Durada cicle (ms)
-* Pressió màxima inspiració (cm H2O)
+* Pressió màxima del cicle (cm H2O)
+* Pressió mínima del cicle (cm H2O)
 * Pressió Plateau durant inspiració (cm H2O)
 * Ratio inspiració/espiració (1:x) típicament entre 1:1 1:2
 * Pressió al final espiració (cm H2O)
+
 
 Fa un paquet amb identificador del dispositiu i  ABC,T,max,plateau,ratio,peep i l'envia per UDP
 
 
 
-###
+### Raspberry Pi
 
-
+Qualsevol model serveix. 
 
 
 # Elements a desenvolupar
@@ -43,9 +45,10 @@ Fa un paquet amb identificador del dispositiu i  ABC,T,max,plateau,ratio,peep i 
 
 Funcionalitat recollida de dades 
 
-Processat per 
+Processat per calcular
 
-Configuració: Cada trasto s'ha de connectar a un PC i se li pot donar el identificador ABC
+Configuració: Cada trasto s'ha de connectar a un PC i se li pot donar el identificador ABC. Això s'ha 
+de poder fer "en el camp"
 
 
 ## Core Raspberry
@@ -53,6 +56,9 @@ Configuració: Cada trasto s'ha de connectar a un PC i se li pot donar el identi
 Produir Acces Point
 
 Donar adreces DHCP
+
+*Establir entorn de desenvolupament*: que s'hi puguin connectar ESP's, que s'hi pugi accedir des del 
+PC de desenvolupament, que s'hi puguin instal·lar coses
 
 
 ## Aplicació Raspberry
