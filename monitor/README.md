@@ -12,6 +12,8 @@ Cada ESP envia paquets (UDP?) a la Raspberry
 
 Raspberry guarda i presenta informació
 
+![Esquema](schema.jpg)
+
 
 ## Elements
 
