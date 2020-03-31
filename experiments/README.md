@@ -5,14 +5,12 @@ Es tracta de tenir un sistema per monitoritzar diversos respiradors.
 ## Material demanat
 
 
-[Motor NEMA 17 / 3.5Kg con conector y cable!] (https://tienda.bricogeek.com/motores-paso-a-paso/1360-motor-nema-17-35kg-con-conector-y-cable.html)
+[Motor NEMA 17 / 3.5Kg con conector y cable!](https://tienda.bricogeek.com/motores-paso-a-paso/1360-motor-nema-17-35kg-con-conector-y-cable.html)
 
-[Controlador de alta corriente DRV8825 !] 
-  ( https://tienda.bricogeek.com/impresion-3d/853-controlador-de-alta-corriente-drv8825.html)
-[Arduino CNC Shield v3!] 
-  (https://tienda.bricogeek.com/shields-arduino/837-arduino-cnc-shield-v3.html )
-[Arduino Starter Kit (Español) !] (https://tienda.bricogeek.com/kits-electronica-para-montar/541-arduino-starter-kit.html )
-[ESP32 Wroom WIFI + Bluetooth !] (https://tienda.bricogeek.com/arduino-compatibles/1274-esp32-wroom-wifi-bluetooth.html )
+[Controlador de alta corriente DRV8825 !]( https://tienda.bricogeek.com/impresion-3d/853-controlador-de-alta-corriente-drv8825.html)
+[Arduino CNC Shield v3 !](https://tienda.bricogeek.com/shields-arduino/837-arduino-cnc-shield-v3.html )
+[Arduino Starter Kit (Español) !](https://tienda.bricogeek.com/kits-electronica-para-montar/541-arduino-starter-kit.html )
+[ESP32 Wroom WIFI + Bluetooth !](https://tienda.bricogeek.com/arduino-compatibles/1274-esp32-wroom-wifi-bluetooth.html )
 
 
 ## MOTOR
