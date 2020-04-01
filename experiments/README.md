@@ -8,81 +8,66 @@ Es tracta de tenir un sistema per monitoritzar diversos respiradors.
 [Motor NEMA 17 / 3.5Kg con conector y cable!](https://tienda.bricogeek.com/motores-paso-a-paso/1360-motor-nema-17-35kg-con-conector-y-cable.html)
 
 [Controlador de alta corriente DRV8825 !]( https://tienda.bricogeek.com/impresion-3d/853-controlador-de-alta-corriente-drv8825.html)
+
 [Arduino CNC Shield v3 !](https://tienda.bricogeek.com/shields-arduino/837-arduino-cnc-shield-v3.html )
+
 [Arduino Starter Kit (Español) !](https://tienda.bricogeek.com/kits-electronica-para-montar/541-arduino-starter-kit.html )
+
 [ESP32 Wroom WIFI + Bluetooth !](https://tienda.bricogeek.com/arduino-compatibles/1274-esp32-wroom-wifi-bluetooth.html )
 
 
-## MOTOR
+## MOTOR NEMA 17
+
+ *   Modelo: 42BYGH40-1.8-22A
+ *   Ángulo : 1.8 grados
+ *   2 fases
+ *   Voltaje nominal: 3.4V
+ *   Corriente: **1.7A/fase**
+ *   Holding Torque : 3.5kg*cm (48.6 oz/in)
+ *   Detent Torque: 180g*cm
+ *   Diámetro de eje: 5mm
+ *   Resistance del bobinado: 2±10% Ω/fase
+ *   Inductancia del bobinado: 2±20% mH/fase
+ *   Flux máximo: 1.8 Vs
+ *   Maximum Detent Torque: 0.016 N.M
+ *   Total inertia (kg.m.m): 3.5 Kg.m.m
+ *   Total friction (kg.m/s): 4 Kg.m/s
+ *   Step Angle Accuracy : ±5% (full step, no load) 
+ *   Temperatura de funcionamiento:  80°C   Max
+ *   Cable: 50cm con conector tipo JST
+ *   Cable: DFRobot FIT0278
+ *   Peso: 270 gramos
+ *   Dimensiones: 42x42x40mm
+ *   Life: 6000 hours = 250 dies! [segons DFRobot !](https://www.dfrobot.com/product-785.html)
+
+[Motor!](motor.png)
 
 
+## Driver
 
-### ESP 32
+ * Basat en DRV8825 de Texas Instruments 
+ * Compatible amb A4988 de Pololu
 
-Programat des de Arduino IDE en C++
+[Driver!](driver.png)
 
-Llegeix regularment dades analógiques. En fa un processat intern i envia dades de cada
-inspiració: 
+ * S'ha de limitar el corrent del driver amb el tornavís al trimmer.
+   Per limitar a 1A, cal posar Vref=0.5 (Ilim(A)=2xVref(V).
+   El [Video!](https://www.youtube.com/watch?feature=player_embedded&v=89BHS9hfSUk) ho explica bé
 
-* Durada cicle (ms)
-* Pressió màxima del cicle (cm H2O)
-* Pressió mínima del cicle (cm H2O)
-* Pressió Plateau durant inspiració (cm H2O)
-* Ratio inspiració/espiració (1:x) típicament entre 1:1 1:2
-* Pressió al final espiració (cm H2O)
+ * Al Datasheet del DRV8825 (Texas) hi ha la taula 2 que diu el corrent en funció
+   del tipus de step que es fa.
 
-El periode de mostreig hauria de ser 20ms (màxim 60 ms)
+ * Si es fa microstepping el corrent que dóna és realment el 100% que està programat
+ * Si només es fa full stepping només s'arriba al 70%. Per tant, es podria programar corrent més alt.
 
-Fa un paquet amb identificador del dispositiu i  ABC,T,max,plateau,ratio,peep i l'envia per UDP
-
-
-
-### Raspberry Pi
-
-Qualsevol model serveix. 
+ * Encara que la tensió de la font és 12V, la tensió a les bobines és menor (2V al video)
 
 
-# Elements a desenvolupar
+## Com usar el driver
 
-## Codi ESP
+ * Ajustament de microsteps, en funció dels pins M0 M1 i M2.
+   Si es deixen oberts, hi ha pull-downs, i queda en mode full-step: 200 passos/360º
+   Estan
 
-Funcionalitat recollida de dades 
-
-Processat per calcular
-
-Configuració: Abans de posar-lo en servei, cada trasto s'ha de connectar momentàniament 
-a un PC per programar-lo amb identificador ABC que vulguin. Això s'ha 
-de poder fer "en el camp".
-
-
-## Core Raspberry
-
-Produir Acces Point
-
-Donar adreces DHCP
-
-*Establir entorn de desenvolupament*: que s'hi puguin connectar ESP's, que s'hi pugi accedir des del 
-PC de desenvolupament, que s'hi puguin instal·lar coses
-
-
-## Aplicació Raspberry
-
-Rebre paquets UDP
-
-Guardar-los. Un fitxer CSV per cada hora i per cada respirador
-
-Presentació d'informació en temps real. Mode text
-
-Presentació de gràfiques en temps real. Mode gràfic
-
-Si apapreix un nou dispositiu, genera gràfica nova
-
-Alarmes configurables. Interfície d'usuari simple
-
-Timer de canvi de filtre. Alarma. Interfície d'usuari
-
-
-
-## Accessoris Raspberry
-
-Sistema per generar alarma auditiva. Producció Audio. Altaveu
+[Imatge de com es connecten!](stepper motor with arduino cnc shield)
+ 
