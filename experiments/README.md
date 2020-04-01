@@ -67,7 +67,26 @@ Es tracta de tenir un sistema per monitoritzar diversos respiradors.
 
  * Ajustament de microsteps, en funció dels pins M0 M1 i M2.
    Si es deixen oberts, hi ha pull-downs, i queda en mode full-step: 200 passos/360º
-   Estan
+   A la shield, estan disponibles a sota del driver, amb jumpers.
 
-![Imatge de com es connecten](stepper motor with arduino cnc shield)
+![Imatge de com es connecten](stepmotor.png)
  
+ * Els pins STP i DIR són els importants.
+
+
+Es pot usar com diu [aquí](http://aconcaguasci.blogspot.com/2016/11/arduino-cnc-shield-control-stepper.html):
+```C
+void step(boolean dir, byte dirPin, byte stepperPin, int steps)
+{
+  digitalWrite(dirPin, dir);
+  delay(100);
+  for (int i = 0; i < steps; i++) {
+    digitalWrite(stepperPin, HIGH);
+    delayMicroseconds(delayTime); 
+    digitalWrite(stepperPin, LOW);
+    delayMicroseconds(delayTime); 
+  }
+}
+
+
+```
