@@ -75,6 +75,7 @@ Es tracta de tenir un sistema per monitoritzar diversos respiradors.
 
 
 Es pot usar com diu [aquí](http://aconcaguasci.blogspot.com/2016/11/arduino-cnc-shield-control-stepper.html):
+
 ```C
 void step(boolean dir, byte dirPin, byte stepperPin, int steps)
 {
@@ -87,6 +88,30 @@ void step(boolean dir, byte dirPin, byte stepperPin, int steps)
     delayMicroseconds(delayTime); 
   }
 }
-
-
 ```
+
+```C
+void setup(){
+  pinMode(X_DIR, OUTPUT); pinMode(X_STP, OUTPUT);
+  pinMode(Y_DIR, OUTPUT); pinMode(Y_STP, OUTPUT);
+  pinMode(Z_DIR, OUTPUT); pinMode(Z_STP, OUTPUT);
+  pinMode(EN, OUTPUT);
+  digitalWrite(EN, LOW);
+}
+
+void loop(){
+  step(false, X_DIR, X_STP, stps); //X, Clockwise
+  step(false, Y_DIR, Y_STP, stps); //Y, Clockwise
+  step(false, Z_DIR, Z_STP, stps); //Z, Clockwise
+  delay(100);
+
+  step(true, X_DIR, X_STP, stps); //X, Counterclockwise
+  step(true, Y_DIR, Y_STP, stps); //Y, Counterclockwise
+  step(true, Z_DIR, Z_STP, stps); //X, Counterclockwise
+  delay(100);
+}
+```
+
+
+* En [aquest tutorial](https://www.makerguides.com/drv8825-stepper-motor-driver-arduino-tutorial/) ho explica prou bé.
+  Fa referència a la llibreria **accelstepper** 
