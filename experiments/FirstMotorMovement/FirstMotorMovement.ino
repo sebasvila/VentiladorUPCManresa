@@ -7,8 +7,8 @@
 # define DIR   6
 # define STP   3
 
-# define stepsPerTurn 200
-# define step_us  600
+# define stepsPerTurn 800
+# define step_us  80
 # define maxTurns 10
 
 

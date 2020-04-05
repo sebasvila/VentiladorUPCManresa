@@ -1,0 +1,19 @@
+# Created by Octave 4.2.2, Sun Apr 05 18:26:13 2020 CEST <pere@tsc-HP-ProBook-450-G6>
+# name: s
+# type: sq_string
+# elements: 1
+# length: 336
+{ 25 , 55000 }, // steps : 1
+{ 50 , 1285 }, // steps : 39
+{ 50 , 675 }, // steps : 75
+{ 50 , 491 }, // steps : 102
+{ 50 , 417 }, // steps : 120
+{ 50 , 397 }, // steps : 126
+{ 50 , 417 }, // steps : 120
+{ 50 , 491 }, // steps : 102
+{ 50 , 675 }, // steps : 75
+{ 50 , 1285 }, // steps : 39
+{ 25 , 55000 }, // steps : 1
+// Total steps :800
+
+
