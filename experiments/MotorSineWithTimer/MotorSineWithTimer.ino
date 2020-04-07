@@ -7,6 +7,9 @@
   1-cos() in CW direction
   constant speed in the CCW direction
 */
+#include <LiquidCrystal.h>
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 7, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 # define EN    8
 # define DIR   6
@@ -18,6 +21,8 @@
 # define nTargets 11
 
 # define specialStep 0
+
+
 
 struct target_t {
   unsigned long t;  // time in ms
@@ -86,7 +91,9 @@ void table_schedule_at(unsigned long t_ms,   // schedule time in ms
   table_finished = false;
   table_keepEnabled = keep_enabled;
   motor_setDir(dir);
-
+  lcd.setCursor(0, 1);
+  lcd.print(t_ms);
+  
   for (int i = 0; i < nTargets; i++) {
     Serial.print(table[i].t);
     Serial.print(" : ");
@@ -187,7 +194,7 @@ void motor_update() {
 //========================================================================
 void setup() {
   motor_setup();
-
+  lcd.begin(16, 2);
   Serial.begin(115200);
 
   step_us = target[0].p;
