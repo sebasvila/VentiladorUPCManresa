@@ -27,19 +27,20 @@ Some [information on Github](https://github.com/espressif/arduino-esp32/issues/5
 
 If the [python the executable does not work](https://stackoverflow.com/questions/35898734/pip-installs-packages-successfully-but-executables-not-found-from-command-line/35899029), add this to .bashrc file
 
-    export PATH="$HOME/.local/bin:$PATH"
+`export PATH="$HOME/.local/bin:$PATH"`
     
 * Press the flash button and write
 
-    esptool.py --port /dev/ttyUSB0 erase_flash
- 
+Hello
+
+`esptool.py --port /dev/ttyUSB0 erase_flash`
  
  MAC: 4c:11:ae:c8:e1:a8
 
 * Press the flash button and wirte
 
-    esptool.py --chip esp32 --port /dev/ttyUSB0 write_flash -z 0x1000 esp32-idf3-20200407-v1.12-351-gbd5633778.bin
+`esptool.py --chip esp32 --port /dev/ttyUSB0 write_flash -z 0x1000 esp32-idf3-20200407-v1.12-351-gbd5633778.bin`
 
 * Log into the ESP32
 
-    picocom /dev/ttyUSB0 -b115200
+`picocom /dev/ttyUSB0 -b115200`
