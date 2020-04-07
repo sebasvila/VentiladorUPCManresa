@@ -30,15 +30,15 @@ struct target_t {
 const target_t target[nTargets] = {
   // millis, stepPeriod
   {   0 , specialStep }, // steps : 0
-  { 100 , 2565 }, // steps : 39
-  { 200 , 1348 }, // steps : 75
+  { 100 , 2560 }, // steps : 39
+  { 200 , 1340 }, // steps : 75
   { 300 ,  980 }, // steps : 103
-  { 400 ,  833 }, // steps : 121
-  { 500 ,  793 }, // steps : 127
-  { 600 ,  833 }, // steps : 121
+  { 400 ,  830 }, // steps : 121
+  { 500 ,  790 }, // steps : 127
+  { 600 ,  830 }, // steps : 121
   { 700 ,  980 }, // steps : 103
-  { 800 , 1348 }, // steps : 75
-  { 900 , 2565 }, // steps : 39
+  { 800 , 1340 }, // steps : 75
+  { 900 , 2560 }, // steps : 39
   {1000 , specialStep }, // steps : 0
   // Total steps :798
 };
@@ -196,9 +196,9 @@ void setup() {
   time0 = micros();
 
   main_dir = CW;
-  table_schedule_at(2000, main_dir, 4000, 1000, true);
-  //                ^     ^         ^     ^
-  //                when  CW/CCW    steps duration
+  table_schedule_at(2000 , main_dir, 4000, 1000,     true);
+  //                ^      ^         ^     ^         ^
+  //                when   CW/CCW    steps duration  keep enabled after end
 
   Serial.println(table_active);
   Serial.println(table_scheduled);
