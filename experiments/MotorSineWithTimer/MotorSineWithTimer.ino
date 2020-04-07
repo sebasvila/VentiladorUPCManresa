@@ -27,7 +27,7 @@ struct target_t {
 
 
 // ==================== TARGET ====================
-target_t target[nTargets] = {
+const target_t target[nTargets] = {
   // millis, stepPeriod
   {   0 , specialStep }, // steps : 0
   { 100 , 2565 }, // steps : 39
@@ -61,20 +61,30 @@ long int period;
 boolean table_active = false;
 boolean table_scheduled = false;
 boolean table_finished = false;
+boolean table_keepEnabled = true;
 int table_index;
 target_t table[nTargets];
 //------------------------------------------------------------------------
-void table_schedule_at(unsigned long t_ms,
-                       uint8_t dir,
-                       unsigned long nSteps,
-                       unsigned long dur_ms) {
-  // build the table for the scheduled
+void table_schedule_at(unsigned long t_ms,   // schedule time in ms
+                       uint8_t dir,          // CW / CCW
+                       unsigned long nSteps, // how many steps: 800 = 1 rev
+                       unsigned long dur_ms, // how long lasts in ms
+                       boolean keep_enabled) // keep motor enabled after end?
+{
+  // build the table for the scheduled event
   for (int i = 0; i < nTargets; i++) {
+    // Table was normalized for 1000 ms. Scale in proportion
     table[i].t = (target[i].t * dur_ms) / 1000 + t_ms;
+    // Table was normalized for 800 steps. Scale in proportion
     table[i].p = (800 * target[i].p) * dur_ms / (nSteps * 1000);
   }
+
+  // TODO: build an enumeration of table statuses and code the logic
+  //   deactivated -> scheduled -> active -> finished
+
   table_scheduled = true;
-  table_finished=false;
+  table_finished = false;
+  table_keepEnabled = keep_enabled;
   motor_setDir(dir);
 
   for (int i = 0; i < nTargets; i++) {
@@ -86,6 +96,7 @@ void table_schedule_at(unsigned long t_ms,
 }
 
 void table_activate() {
+  motor_enable(true);
   table_active = true;
   table_finished = false;
   table_index = 0;
@@ -95,6 +106,7 @@ void table_activate() {
 void table_deactivate() {
   table_active = false;
   table_scheduled = false;
+  motor_enable(table_keepEnabled);
   Serial.println("D");
 }
 
@@ -127,11 +139,19 @@ void motor_setup() {
   pinMode(DIR, OUTPUT);
   pinMode(STP, OUTPUT);
 
-  digitalWrite(EN , LOW );
   motor_setDir(CW);
 
   totalCWSteps = 0;
   totalCCWSteps = 0;
+}
+
+void motor_enable(boolean enable) {
+  if (enable) {
+    digitalWrite(EN , LOW );
+  }
+  else {
+    digitalWrite(EN , HIGH );
+  }
 }
 
 void motor_setDir(uint8_t val) {
@@ -175,8 +195,10 @@ void setup() {
   t_ms0 = millis();
   time0 = micros();
 
-  main_dir=CW;
-  table_schedule_at(2000, main_dir, 4000, 1000); // schedule a movement at 1s from now
+  main_dir = CW;
+  table_schedule_at(2000, main_dir, 4000, 1000, true);
+  //                ^     ^         ^     ^
+  //                when  CW/CCW    steps duration
 
   Serial.println(table_active);
   Serial.println(table_scheduled);
@@ -184,7 +206,6 @@ void setup() {
 }
 
 //========================================================================
-// the loop function runs over and over again forever
 void loop() {
 
   //Do the fast stuff
@@ -193,12 +214,14 @@ void loop() {
   //Do the slow stuff
   table_update();
   if (table_finished) {
-    if (main_dir==CW) {
-      main_dir=CCW;
+    if (main_dir == CW) {
+      main_dir = CCW;
+      table_schedule_at(millis() + 2000, main_dir, 4000, 800, false);
     }
     else {
-      main_dir=CW;
+      main_dir = CW;
+      table_schedule_at(millis() + 2000, main_dir, 4000, 800, true);
     }
-    table_schedule_at(millis() + 2000, main_dir, 4000, 1000);
+
   }
 }
