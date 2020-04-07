@@ -1,0 +1,13 @@
+lsusb
+
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 005: ID 06cb:00b7 Synaptics, Inc. 
+Bus 001 Device 029: ID 2341:0043 Arduino SA Uno R3 (CDC ACM)
+Bus 001 Device 025: ID 3938:1031  
+Bus 001 Device 024: ID 413c:2010 Dell Computer Corp. Keyboard
+Bus 001 Device 023: ID 413c:1003 Dell Computer Corp. Keyboard Hub
+Bus 001 Device 022: ID 05e3:0608 Genesys Logic, Inc. Hub
+Bus 001 Device 002: ID 04f2:b669 Chicony Electronics Co., Ltd 
+Bus 001 Device 007: ID 8087:0aaa Intel Corp. 
+Bus 001 Device 030: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x UART Bridge / myAVR mySmartUSB light
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
