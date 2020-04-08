@@ -47,6 +47,26 @@ Hello
 
 # First Tests
 
+## LED on and off
+
+```
+>>> import machine
+>>> pin = machine.Pin(2, machine.Pin.OUT)
+>>> pin.on()
+>>> pin.off()
+
+```
+
+## Read Input
+```
+>>> pin_en=machine.Pin(25,machine.Pin.IN)
+>>> print(pin_en.value())
+0
+>>> print(pin_en.value())
+1
+
+```
+
 ## Connect to network
 ```
 picocom /dev/ttyUSB0 -b115200
