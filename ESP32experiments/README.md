@@ -44,3 +44,30 @@ Hello
 * Log into the ESP32
 
 `picocom /dev/ttyUSB0 -b115200`
+
+# First Tests
+
+## Connect to network
+```
+picocom /dev/ttyUSB0 -b115200
+
+>>> import network
+>>> sta_if.active(True)
+>>> sta_if.connect('...mySSID...','...passwd...')
+
+I (53522837) network: CONNECTED
+I (53522877) wifi: AP's beacon interval = 102400 us, DTIM period = 1
+I (53523797) event: sta ip: 192.168.1.25, mask: 255.255.255.0, gw: 192.168.1.2
+I (53523797) network: GOT_IP
+```
+## Connect to a server
+On the server side
+```
+netcat -l 9000
+```
+On the ESP32
+```
+>>> s=socket.socket()
+>>> s.connect(('192.168.1.15',9000))
+>>> s.sendall(b'Hello\n')
+```
