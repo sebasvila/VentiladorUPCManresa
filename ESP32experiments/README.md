@@ -123,4 +123,20 @@ A good tutorial can be found [here}(https://www.digikey.es/en/maker/projects/mic
    ```
    ampy --port /dev/ttyUSB0 run --no-output test.py
    ```
+## Configuring AMPY
 
+Edit configuration file
+```
+nano ~\.ampy
+```
+And write this
+```
+AMPY_PORT=/dev/ttyUSB0
+AMPY_BAUD=115200
+AMPY_DELAY=0.5
+```
+After this, you can type 
+```
+ampy ls
+```
+to list the files on the ESP
