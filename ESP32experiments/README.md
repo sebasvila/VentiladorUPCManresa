@@ -4,7 +4,7 @@ Some [information on Github](https://github.com/espressif/arduino-esp32/issues/5
 
 [Getting started](https://docs.micropython.org/en/latest/esp32/tutorial/intro.html) with Micropython on the ESP.
 
-
+[PinOut reference and general, very useful, info](https://randomnerdtutorials.com/esp32-pinout-reference-gpios/)
 
 
 [DOIT ESP32 DEVKIT V1 – 30 PINES](https://www.esploradores.com/eligiendo_una_placa_esp32/)
@@ -45,6 +45,8 @@ Hello
 
 `picocom /dev/ttyUSB0 -b115200`
 
+**NOTE: to disconnect picocom use ```<Ctrl-a><Ctrl-x>```**
+
 # First Tests
 
 ## LED on and off
@@ -57,7 +59,7 @@ Hello
 
 ```
 
-## Read Input
+## Read Digital Input
 ```
 >>> pin_en=machine.Pin(25,machine.Pin.IN)
 >>> print(pin_en.value())
@@ -66,6 +68,19 @@ Hello
 1
 
 ```
+## Read Analog Input
+```
+>>> pot=machine.ADC(machine.Pin(33))
+>>> pot.width(machine.ADC.WIDTH_10BIT)
+>>> pot.atten(machine.ADC.ATTN_11DB)
+>>> print(pot.read())
+532
+>>> print(pot.read())
+691
+>>> print(pot.read())
+1023
+```
+
 
 ## Connect to network
 ```
@@ -91,3 +106,21 @@ On the ESP32
 >>> s.connect(('192.168.1.15',9000))
 >>> s.sendall(b'Hello\n')
 ```
+## Run files on the ESP
+
+A good tutorial can be found [here}(https://www.digikey.es/en/maker/projects/micropython-basics-load-files-run-code/fb1fcedaf11e4547943abfdd8ad825ce)
+
+*  Install ampy
+   ```
+   pip3 install adafruit-ampy
+   ```
+*  Edit a local file and send it to be executed on the ESP:
+   ```
+   ampy --port /dev/ttyUSB0 run test.py
+   ```
+   This sends the output to the local window
+*  As an alternative, send the file, execute in on the ESP and **then** log in the ESP with picocom
+   ```
+   ampy --port /dev/ttyUSB0 run --no-output test.py
+   ```
+
