@@ -99,3 +99,15 @@ while True:
 ```
 
 On the listener window, the pot value is printed every 1s
+
+
+# Python classes implementing mqtt
+
+[paho.mqtt](http://www.steves-internet-guide.com/into-mqtt-python-client/)
+
+## Test implementation
+A script [implementing](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/mqtt_listener_and_plot.py) a simple mqtt **listener** and plotting the result in real time (Python)
+
+The **sender** is an ESP32, implemented via a [boot.py](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/boot.py) and a [main.py](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/main.py) script
+
+TODO: a **sender** script, to allow testing
