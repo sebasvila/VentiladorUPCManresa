@@ -2,7 +2,7 @@
 
 def connect():
   global client_id, mqtt_server
-  client = MQTTClient(client_id, mqtt_server)
+  client = MQTTClient(client_id, mqtt_server, user=mqtt_userID, password=mqtt_password)
   client.connect()
   print('Connected to %s MQTT broker' % (mqtt_server))
   return client

@@ -15,7 +15,9 @@ from myconfig import *
 #  ssid = 'REPLACE_WITH_YOUR_SSID'
 #  password = 'REPLACE_WITH_YOUR_PASSWORD'
 #  mqtt_server = 'REPLACE_WITH_YOUR_MQTT_BROKER_IP'
-
+#  mqtt_userID = 'user'
+#  mqtt_password = 'password'
+#  mqtt_port = 0
 
 client_id = ubinascii.hexlify(machine.unique_id())
 topic_sub = b'notification'
