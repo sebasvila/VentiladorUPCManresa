@@ -24,7 +24,7 @@ topic_sub = b'notification'
 topic_pub = b'test'
 
 last_message = 0
-message_interval = 1
+message_interval = 0.1
 counter = 0
 
 station = network.WLAN(network.STA_IF)
