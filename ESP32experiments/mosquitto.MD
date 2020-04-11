@@ -111,3 +111,21 @@ A script [implementing](https://github.com/PerePala/VentiladorUPCManresa/blob/ma
 The **sender** is an ESP32, implemented via a [boot.py](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/boot.py) and a [main.py](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/main.py) script
 
 TODO: a **sender** script, to allow testing
+Added a sender that sends mqtt packets, [mqtt_sender.py](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/mqtt_sender.py)
+
+# Monitoring the packets
+
+```
+sudo tcpdump -n port 1883
+
+13:18:55.750694 IP 192.168.1.25.51103 > 192.168.1.15.1883: Flags [P.], seq 85:87, ack 1, win 5740, length 2
+13:18:55.750749 IP 192.168.1.15.1883 > 192.168.1.25.51103: Flags [.], ack 87, win 64071, length 0
+13:18:55.754016 IP 192.168.1.25.51103 > 192.168.1.15.1883: Flags [P.], seq 87:102, ack 1, win 5740, length 15
+13:18:55.754056 IP 192.168.1.15.1883 > 192.168.1.25.51103: Flags [.], ack 102, win 64071, length 0
+13:18:56.774691 IP 192.168.1.25.51103 > 192.168.1.15.1883: Flags [P.], seq 102:104, ack 1, win 5740, length 2
+13:18:56.774740 IP 192.168.1.15.1883 > 192.168.1.25.51103: Flags [.], ack 104, win 64071, length 0
+13:18:56.777750 IP 192.168.1.25.51103 > 192.168.1.15.1883: Flags [P.], seq 104:119, ack 1, win 5740, length 15
+13:18:56.777773 IP 192.168.1.15.1883 > 192.168.1.25.51103: Flags [.], ack 119, win 64071, length 0
+```
+
+This seems to indicate that every MQTT transaction starts with a 2 byte packet, followed by the actual payload (15 bytes in this case). As we are transmitting ```pot > 132``` this means that there is some additional overhead.
