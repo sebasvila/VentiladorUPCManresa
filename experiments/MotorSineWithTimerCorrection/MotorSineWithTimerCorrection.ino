@@ -25,27 +25,26 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 
 struct target_t {
-  unsigned long t;  // time in ms
-  unsigned long p;  // period in us
-
+  uint32_t t;  // time in ms
+  uint32_t p;  // period in us
+  uint32_t s;  // number of steps
 };
 
 
 // ==================== TARGET ====================
 const target_t target[nTargets] = {
-  // millis, stepPeriod
-  {   0 , specialStep }, // steps : 0
-  { 100 , 2560 }, // steps : 39
-  { 200 , 1340 }, // steps : 75
-  { 300 ,  960 }, // steps : 103
-  { 400 ,  820 }, // steps : 121
-  { 500 ,  700 }, // steps : 127
-  { 600 ,  820 }, // steps : 121
-  { 700 ,  960 }, // steps : 103
-  { 800 , 1340 }, // steps : 75
-  { 900 , 2560 }, // steps : 39
-  {1000 , specialStep }, // steps : 0
-  // Total steps :798
+// time, step_us, number of steps 
+{  0       , specialStep, 0 }, 
+{ 1000000 , 510725 , 1958 }, 
+{ 2000000 , 175994 , 7640 }, 
+{ 3000000 , 113007 , 16489 }, 
+{ 4000000 , 89678 , 27640 }, 
+{ 5000000 , 80906 , 40000 }, 
+{ 6000000 , 80906 , 52360 }, 
+{ 7000000 , 89678 , 63511 }, 
+{ 8000000 , 113007 , 72360 }, 
+{ 9000000 , 175994 , 78042 }, 
+{ 10000000 , 510725 , 80000 }, 
 };
 
 
@@ -56,7 +55,7 @@ unsigned long t_ms0, t_ms1;  // milliseconds
 
 uint8_t motor_currDir; // current direction
 uint8_t main_dir; // direction in main loop
-unsigned long totalCWSteps, totalCCWSteps;
+unsigned long totalSteps, totalCWSteps, totalCCWSteps;
 
 // Auxiliary variables
 long int period;
@@ -67,6 +66,7 @@ boolean table_active = false;
 boolean table_scheduled = false;
 boolean table_finished = false;
 boolean table_keepEnabled = true;
+uint32_t table_DT;
 int table_index;
 target_t table[nTargets];
 //------------------------------------------------------------------------
@@ -83,6 +83,7 @@ void table_schedule_at(unsigned long t_ms,   // schedule time in ms
     // Table was normalized for 800 steps. Scale in proportion
     table[i].p = (800 * target[i].p) * dur_ms / (nSteps * 1000);
   }
+  table_DT=1000*dur_ms/
 
   // TODO: build an enumeration of table statuses and code the logic
   //   deactivated -> scheduled -> active -> finished
@@ -122,6 +123,7 @@ void table_update() {
   t_ms1 = millis();
   if (table_active) {
     if (t_ms1 >= table[table_index].t) {
+      err=totalSteps - table[table_index].s; // real - should
       table_index++;
       if (table_index > nTargets) {
         table_deactivate();
@@ -131,7 +133,7 @@ void table_update() {
         Serial.print("CW  >> ");
         Serial.println(totalCWSteps);
       }
-      step_us = table[table_index].p;
+      step_us = table_DT*table[table_index].p*(1 + err*table[table_index].p);
     }
   }
   else { //see if it has to become active
@@ -155,6 +157,7 @@ void motor_setup() {
 void motor_resetCounters() {
   totalCWSteps = 0;
   totalCCWSteps = 0;
+  totalSteps = 0;
 }
 
 void motor_enable(boolean enable) {
@@ -177,6 +180,7 @@ void motor_doStep() {
     delayMicroseconds(2);
     digitalWrite(STP, LOW);
     delayMicroseconds(2);
+    totalSteps++;
     if (motor_currDir == CW) {
       totalCWSteps++;
     }
