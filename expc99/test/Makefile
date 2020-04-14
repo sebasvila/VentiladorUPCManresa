@@ -9,7 +9,7 @@ VPATH = ..
 
 # Default
 .PHONY: all
-all:	test_timer test_timer2 test_pin test_ticker
+all:	test_timer test_timer2 test_pin test_ticker test_adc
 
 
 # Utils
@@ -34,6 +34,7 @@ implanta_%: %.hex
 
 
 # Dependències
+test_adc: adc.o ticker.o shielditic.c
 test_ticker: ticker.o shielditic.o
 test_timer2: pin.o timer.o
 test_timer: pin.o timer.o
@@ -46,3 +47,4 @@ timer.o: timer.c timer.h
 vaction.o: vaction.c pt.h lc.h lc-switch.h timer.h pin.h shielditic.h \
  vaction.h
 ticker.o: ticker.h
+adc.o: adc.h

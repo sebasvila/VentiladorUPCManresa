@@ -39,3 +39,4 @@ timer.o: timer.c timer.h
 vaction.o: vaction.c pt.h lc.h lc-switch.h timer.h pin.h shielditic.h \
  vaction.h
 ticker.o: ticker.h
+adc.o: adc.h

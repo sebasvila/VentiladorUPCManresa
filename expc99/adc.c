@@ -1,7 +1,5 @@
 #include <avr/io.h>
-
-
-
+#include "adc.h"
 
 
 uint16_t adc_read(uint8_t ch)
@@ -26,8 +24,25 @@ uint16_t adc_read(uint8_t ch)
 
 
 
-void adc_setup(void)
-{
+void adc_start_reading(uint8_t ch) {
+  // select the corresponding channel 0~7
+  // ANDing with ’7′ will always keep the value
+  // of ‘ch’ between 0 and 7
+  ch &= 0x07;  // AND operation with 7
+  ADMUX = (ADMUX & 0xF8) | ch; // clears the bottom 3 bits before ORing
+ 
+  // start single convertion
+  // write ’1′ to ADSC
+  ADCSRA |= _BV(ADSC);
+}
+
+ 
+  
+extern bool adc_read_finished(void);
+extern uint16_t adc_get_read(void);
+
+
+void adc_setup(void) {
     // AREF = AVcc
     ADMUX = _BV(REFS0);
  
