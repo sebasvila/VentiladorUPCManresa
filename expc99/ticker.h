@@ -20,8 +20,8 @@ void ticker_start(void);
 /* Get current ticker value */
 uint16_t ticker_get(void);
 
-/* Get ticker beat in ticks/c */
-inline uint16_t ticker_ticks_per_second(void) {
+/* Get ticker beat in ticks per second */
+inline uint16_t ticker_tps(void) {
   return 16000000/1024/125;
 }
 

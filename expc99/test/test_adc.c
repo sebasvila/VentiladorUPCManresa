@@ -9,7 +9,9 @@
 static uint16_t offset;
 
 /*
- * Runs a moving semaphore led at offset period
+ * Runs a rotating led at periods of `offset`.  `offset` cannot be 0,
+ * otherwise thread do not yields never and becomes non-collaborative,
+ * starvating other threads.
  */
 PT_THREAD(sem(struct pt *pt))
 {
@@ -19,21 +21,28 @@ PT_THREAD(sem(struct pt *pt))
 
   for(;;) {
     led_toggle(semaph1, green);
-    chronos = ticker_get() + offset;
-    PT_WAIT_UNTIL(pt, ticker_get() > chronos);
+    /* 
+     * To cope with ticker overflow: compare always duration, not
+     * timestamp
+     */
+    chronos = ticker_get();
+    PT_WAIT_WHILE(pt, ticker_get() - chronos <= offset);
     led_toggle(semaph1, green);
     
     led_toggle(semaph1, yellow);
-    chronos = ticker_get() + offset;
-    PT_WAIT_UNTIL(pt, ticker_get() > chronos);
+    chronos = ticker_get();
+    PT_WAIT_WHILE(pt, ticker_get() - chronos <= offset);
     led_toggle(semaph1, yellow);
     
     led_toggle(semaph1, red);
-    chronos = ticker_get() + offset;
-    PT_WAIT_UNTIL(pt, ticker_get() > chronos);
+    chronos = ticker_get();
+    /* a `<=` guarantees that thread yields although offset == 0 */
+    PT_WAIT_WHILE(pt, ticker_get() - chronos <= offset);
     led_toggle(semaph1, red);
   }
 
+  
+  
   PT_END(pt);
 }
 
@@ -52,11 +61,11 @@ PT_THREAD(pot(struct pt *pt))
     /* non-blocking adc read from shield itic potentiometer (ch 1) */
     adc_start_reading(1);
     PT_WAIT_UNTIL(pt, adc_read_finished());
-    offset = adc_get_read()/((1<<10)/(ticker_ticks_per_second()));
+    offset = adc_get_read() / ((1<<10)*2/ticker_tps());
 
     /* polling time of potentiometer */
-    chronos = ticker_get() + ticker_ticks_per_second()/10;
-    PT_WAIT_UNTIL(pt, ticker_get() > chronos);
+    chronos = ticker_get();
+    PT_WAIT_WHILE(pt, ticker_get()-chronos < ticker_tps()/10u);
   }
 
   PT_END(pt);
@@ -81,7 +90,7 @@ int main(void) {
   PT_INIT(&pot_ctx);
 
   /* read initial position of potentiometer */
-  offset = adc_read(1)/((1<<10)/(ticker_ticks_per_second()));
+  offset = adc_read(1)/((1<<9)*2/(ticker_tps()));
   
   /* do schedule of threads */
   for(;;) {

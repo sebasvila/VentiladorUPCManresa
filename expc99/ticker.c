@@ -35,7 +35,7 @@ uint16_t ticker_get(void) {
 }
 
 
-extern uint16_t ticker_ticks_per_second(void);
+extern uint16_t ticker_tps(void);
 
 
 void ticker_stop(void) {

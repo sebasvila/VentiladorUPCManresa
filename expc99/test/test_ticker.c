@@ -26,13 +26,13 @@ int main() {
   /* test */
   ticker_start();
   led_on(semaph1, green);
-  ticks = ticker_get() + ticker_ticks_per_second()/2;
+  ticks = ticker_get() + ticker_tps()/2;
   while (ticker_get() < ticks);
   led_on(semaph1, yellow);
-  ticks = ticker_get() + 1*ticker_ticks_per_second();
+  ticks = ticker_get() + 1*ticker_tps();
   while (ticker_get() < ticks);
   led_on(semaph1, red);
-  ticks = ticker_get() + 2*ticker_ticks_per_second();
+  ticks = ticker_get() + 2*ticker_tps();
   while (ticker_get() < ticks);
   led_off(semaph1, green);
   led_off(semaph1, yellow);
@@ -40,7 +40,7 @@ int main() {
 
   for (uint8_t i=0; i<100; i++) {
     led_toggle(semaph1, yellow);
-    ticks = ticker_get() + ticker_ticks_per_second()/10;
+    ticks = ticker_get() + ticker_tps()/10;
     while (ticker_get() < ticks);
   }
   led_off(semaph1, yellow);
@@ -48,7 +48,7 @@ int main() {
 
   for (uint8_t i=0; i<200; i++) {
     led_toggle(semaph1, yellow);
-    ticks = ticker_get() + ticker_ticks_per_second()/20;
+    ticks = ticker_get() + ticker_tps()/20;
     while (ticker_get() < ticks);
   }
   led_off(semaph1, yellow);
@@ -56,7 +56,7 @@ int main() {
 
   for (uint8_t i=0; i<200; i++) {
     led_toggle(semaph1, yellow);
-    ticks = ticker_get() + ticker_ticks_per_second()/40;
+    ticks = ticker_get() + ticker_tps()/40;
     while (ticker_get() < ticks);
   }
   led_off(semaph1, yellow);
