@@ -72,7 +72,7 @@ int main(void) {
   /* init modules */
   ticker_setup();
   ticker_start();
-  shielditic_init();
+  shielditic_setup();
   adc_setup();
   sei();
   

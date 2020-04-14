@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include "shielditic.h"
 
-void shielditic_init(void) {
+void shielditic_setup(void) {
   /* set semaph pins in output mode */
   DDRC |= 
     _BV(DDC2) |  /* sem2: red */

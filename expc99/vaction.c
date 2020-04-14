@@ -196,7 +196,7 @@ struct pt vaction_setup(void) {
 
   /* init modules */
   timer_setup(t15625);
-  shielditic_init();
+  shielditic_setup();
   /* init thread context */
   PT_INIT(&vaction_context);
   /* setup computed parameters for first time */

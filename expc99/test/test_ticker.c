@@ -10,7 +10,7 @@ int main() {
   uint16_t ticks;
   
   ticker_setup();
-  shielditic_init();
+  shielditic_setup();
   sei();
 
   /* signal start of test */
