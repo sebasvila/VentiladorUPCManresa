@@ -9,7 +9,7 @@
  * to read or write the pin value. pin_destroy() is used in order to
  * unbind the pin and leave it as in reset state.
  */
-#include <inttypes.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 
