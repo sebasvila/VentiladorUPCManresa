@@ -5,8 +5,7 @@
 #include <util/delay.h>
 #include "pt.h"
 #include "timer.h"
-#include "pin.h"
-#include "shielditic.h"
+#include "motor.h"
 #include "vaction.h"
 
 
@@ -29,7 +28,7 @@ const float exp_lowering_time = 0.7;
 
 
 /*****************************************************************
- * Ventilation action dynamic parameters (change next breathe)
+ * Ventilation action dynamic parameters (change next time used)
  *****************************************************************/
 
 static struct vaction_params {
@@ -115,23 +114,16 @@ void vaction_set_tr(uint8_t tr) {
 
 
 /*****************************************************************
- * Ventilation action emulator
+ * Ventilation action timer callbacks
  *****************************************************************/
-
-static void toggle_led_s1r(void) {
-  led_toggle(semaph1, red);
-}
-
-static void toggle_led_s1g(void) {
-  led_toggle(semaph1, green);
-}
-
 static void do_nothing(void) {}
 
 
     
 
-
+/*****************************************************************
+ * Breathing action thread
+ *****************************************************************/
 
 PT_THREAD(vaction_thread(struct pt *pt))
 {
@@ -140,48 +132,44 @@ PT_THREAD(vaction_thread(struct pt *pt))
   PT_BEGIN(pt);
 
   /* 
-   * breathe forever
+   * breathe forever!!
    */
   for(;;) {
-    /* update computed parameters */
-
-    /* inspiration rising */
+    /* inspiration rising. assume motor wind direction */
     c = (param.ir/10.0) / (param.travel-1) * freq;
-    timer_set_action(toggle_led_s1r);
-    led_on(semaph1, red);
+    timer_set_action(motor_step);
+    motor_enable();
     i = param.travel;
     while (i>0) {
       timer_arm_once(c); 
       PT_WAIT_WHILE(pt, timer_armed());
       i--;
     }
-    led_off(semaph1,red);
     
     /* inspiration pause */
     timer_set_action(do_nothing);
-    led_on(semaph1,yellow);
     timer_arm_once(param.ins_pause); 
     PT_WAIT_WHILE(pt, timer_armed());
-    led_off(semaph1,yellow);
     
     /* expiration lowering */
     c = param.exp_low_c;
-    timer_set_action(toggle_led_s1g);
-    led_on(semaph1, green);
+    motor_reverse(); // set unwind dir
+    timer_set_action(motor_step);
     i = param.travel;
     while (i>0) {
       timer_arm_once(c); 
       PT_WAIT_WHILE(pt, timer_armed());
       i--;
     }
-    led_off(semaph1,green);
+
+    /* Assure home position achieved */
     
     /* expiration pause */
     timer_set_action(do_nothing);
-    led_on(semaph1,yellow);
-    timer_arm_once(param.exp_pause); 
+    timer_arm_once(param.exp_pause);
+    motor_reverse(); // set wind dir again
+    motor_disable(); // action in rest position: break torque not needed
     PT_WAIT_WHILE(pt, timer_armed());
-    led_off(semaph1,yellow);
   }
   
   PT_END(pt);
@@ -190,17 +178,11 @@ PT_THREAD(vaction_thread(struct pt *pt))
 
 
 
-struct pt vaction_setup(void) {
-  /* ventilation action thread context */
-  struct pt vaction_context;
-
+void vaction_setup(void) {
   /* init modules */
   timer_setup(t15625);
-  shielditic_setup();
-  /* init thread context */
-  PT_INIT(&vaction_context);
+  motor_setup();
+  
   /* setup computed parameters for first time */
   update_params();
-
-  return vaction_context;
 }

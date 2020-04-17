@@ -12,9 +12,10 @@ void vaction_set_ie(uint8_t e);
 /* Set travel. Travel in percent of max_travel */
 void vaction_set_tr(uint8_t tr);
 
-
-
+/* ventilation action thread */
 PT_THREAD(vaction_thread(struct pt *pt));
-struct pt vaction_setup(void);
+
+/* module setup */
+void vaction_setup(void);
 
 #endif

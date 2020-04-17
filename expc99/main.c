@@ -1,10 +1,6 @@
-#include <stdbool.h>
 #include <avr/interrupt.h>
-#include <avr/io.h>
-#include <util/delay.h>
 #include "pt.h"
 #include "vaction.h"
-#include "pin.h"
 
 
 
@@ -13,8 +9,12 @@ int main(void) {
   struct pt vaction_ctxt;
 
   /* init modules */
-  vaction_ctxt = vaction_setup();
+  vaction_setup();
   sei();
+
+
+  /* init thread contexts */
+  PT_INIT(&vaction_ctxt);
   
   /* do schedule */
   for(;;) {
