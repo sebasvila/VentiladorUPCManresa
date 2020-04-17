@@ -193,6 +193,7 @@ void motor_update() {
       motor_doStep();
     }
     time0 = time1; // TODO: think if this has to be only when table_active
+    //time0 = time0+step_us; // TODO: think if this has to be only when table_active
   }
 }
 

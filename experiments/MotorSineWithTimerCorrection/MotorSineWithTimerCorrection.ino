@@ -18,7 +18,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 # define CW    LOW
 # define CCW   HIGH
 
-# define nTargets 11
+# define nTargets 10
 
 # define specialStep 0
 
@@ -34,28 +34,29 @@ struct target_t {
 // ==================== TARGET ====================
 const target_t target[nTargets] = {
 // time, step_us, number of steps 
-{  0       , specialStep, 0 }, 
-{ 1000000 , 510725 , 1958 }, 
-{ 2000000 , 175994 , 7640 }, 
-{ 3000000 , 113007 , 16489 }, 
-{ 4000000 , 89678 , 27640 }, 
-{ 5000000 , 80906 , 40000 }, 
-{ 6000000 , 80906 , 52360 }, 
-{ 7000000 , 89678 , 63511 }, 
-{ 8000000 , 113007 , 72360 }, 
-{ 9000000 , 175994 , 78042 }, 
-{ 10000000 , 510725 , 80000 }, 
+{ 100000 , 510725 , 1958 }, 
+{ 200000 , 175994 , 7640 }, 
+{ 300000 , 113007 , 16489 }, 
+{ 400000 , 89678 , 27640 }, 
+{ 500000 , 80906 , 40000 }, 
+{ 600000 , 80906 , 52360 }, 
+{ 700000 , 89678 , 63511 }, 
+{ 800000 , 113007 , 72360 }, 
+{ 900000 , 175994 , 78042 }, 
+{ 1000000 , 510725 , 80000 }, 
+ 
 };
 
 
-unsigned long step_us = 20000; // microseconds
+uint32_t step_us = 20000; // microseconds
 
-unsigned long time0, time1; // microseconds
-unsigned long t_ms0, t_ms1;  // milliseconds
+uint32_t time0, time1; // microseconds
+uint32_t t_ms0, t_ms1;  // milliseconds
 
 uint8_t motor_currDir; // current direction
 uint8_t main_dir; // direction in main loop
-unsigned long totalSteps, totalCWSteps, totalCCWSteps;
+uint32_t totalSteps, totalCWSteps, totalCCWSteps;
+uint32_t err;
 
 // Auxiliary variables
 long int period;
@@ -70,20 +71,20 @@ uint32_t table_DT;
 int table_index;
 target_t table[nTargets];
 //------------------------------------------------------------------------
-void table_schedule_at(unsigned long t_ms,   // schedule time in ms
+void table_schedule_at(uint32_t t_ms,   // schedule time in ms
                        uint8_t dir,          // CW / CCW
-                       unsigned long nSteps, // how many steps: 800 = 1 rev
-                       unsigned long dur_ms, // how long lasts in ms
+                       uint32_t nSteps, // how many steps: 800 = 1 rev
+                       uint32_t dur_ms, // how long lasts in ms
                        boolean keep_enabled) // keep motor enabled after end?
 {
   // build the table for the scheduled event
   for (int i = 0; i < nTargets; i++) {
-    // Table was normalized for 1000 ms. Scale in proportion
-    table[i].t = (target[i].t * dur_ms) / 1000 + t_ms;
-    // Table was normalized for 800 steps. Scale in proportion
-    table[i].p = (800 * target[i].p) * dur_ms / (nSteps * 1000);
+    // Table was normalized for 10000 ms. Scale in proportion
+    table[i].t = (target[i].t * dur_ms) / 1000000 + t_ms;
+    // Table was normalized for 80000 steps. Scale in proportion
+    table[i].p = (80000 * target[i].p) * dur_ms / (nSteps * 1000);
   }
-  table_DT=1000*dur_ms/
+  table_DT=dur_ms/nTargets;
 
   // TODO: build an enumeration of table statuses and code the logic
   //   deactivated -> scheduled -> active -> finished
@@ -133,7 +134,8 @@ void table_update() {
         Serial.print("CW  >> ");
         Serial.println(totalCWSteps);
       }
-      step_us = table_DT*table[table_index].p*(1 + err*table[table_index].p);
+      //step_us = table_DT*table[table_index].p*(1 + err*table[table_index].p);
+      step_us = table[table_index].p;
     }
   }
   else { //see if it has to become active
@@ -196,7 +198,8 @@ void motor_update() {
     if (table_active) {
       motor_doStep();
     }
-    time0 = time1; // TODO: think if this has to be only when table_active
+    //time0 = time1; // TODO: think if this has to be only when table_active
+    time0 = time0+step_us; // TODO: think if this has to be only when table_active
   }
 }
 
