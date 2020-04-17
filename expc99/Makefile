@@ -31,12 +31,13 @@ implanta_%: %.hex
 # Dependències
 
 main: vaction.o timer.o motor.o
-main.o: main.c pt.h lc.h lc-switch.h vaction.h pin.h
-motor.o: motor.c  motor.h
+
+adc.o: adc.c adc.h
+main.o: main.c pt.h lc.h lc-switch.h vaction.h
+motor.o: motor.c motor.h
 pin.o: pin.c pin.h
 shielditic.o: shielditic.c shielditic.h
+ticker.o: ticker.c ticker.h
 timer.o: timer.c timer.h
-vaction.o: vaction.c pt.h lc.h lc-switch.h timer.h pin.h shielditic.h \
- vaction.h
-ticker.o: ticker.h
-adc.o: adc.h
+vaction.o: vaction.c pt.h lc.h lc-switch.h timer.h motor.h vaction.h
+
