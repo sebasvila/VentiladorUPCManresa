@@ -52,7 +52,7 @@ uint16_t table_nSteps, table_dur_ms;
 
 
 
-table_t table[nTargets];
+table_t table[(nTargets+1)/2];
 //------------------------------------------------------------------------
 void table_schedule_at(uint32_t t_ms,   // schedule time in ms
                        uint8_t dir,          // CW / CCW
@@ -60,7 +60,7 @@ void table_schedule_at(uint32_t t_ms,   // schedule time in ms
                        uint16_t dur_ms, // how long lasts in ms
                        boolean keep_enabled) // keep motor enabled after end?
 {
-  const table_t baseTable[nTargets] = {
+  const table_t baseTable[(nTargets+1)/2] = {
     // step,period
     { 16 , 5682 },
     { 47 , 1934 },
@@ -68,11 +68,6 @@ void table_schedule_at(uint32_t t_ms,   // schedule time in ms
     { 96 , 947 },
     { 109 , 834 },
     { 114 , 797 },
-    { 109 , 834 },
-    { 96 , 947 },
-    { 75 , 1212 },
-    { 47 , 1934 },
-    { 16 , 5682 },
   };
 
   table_startTime = t_ms;
@@ -81,7 +76,7 @@ void table_schedule_at(uint32_t t_ms,   // schedule time in ms
   table_nSteps = nSteps;
   table_dur_ms = dur_ms;
   table_keepEnabled = keep_enabled;
-  for (int i = 0; i < nTargets; i++) {
+  for (int i = 0; i < (nTargets+1)/2; i++) {
     table[i].s = (uint32_t) nSteps * (uint32_t)baseTable[i].s / (uint32_t) 800;
     table[i].p = ((uint32_t) dur_ms * (uint32_t) baseTable[i].p * (uint32_t) 4) / ((uint32_t) 5 * (uint32_t) nSteps);
   }
@@ -98,14 +93,24 @@ void table_activate() {
   Serial.println(millis());
 }
 
+uint8_t table_map(uint8_t ix){
+  if (ix<(nTargets+1)/2) {
+     return ix;  
+  }
+  else {
+    return nTargets-ix-1;
+  }
+  
+}
+
 //------------------------------------------------------------------------
 void table_update() {
   if (table_state == ACTIVE) {
-    if (totalSteps >= table[table_index].s) {
+    if (totalSteps >= table[table_map(table_index)].s) {
       totalSteps = 0;
       table_index++;
       if (table_index < nTargets) {
-        step_us = table[table_index].p;
+        step_us = table[table_map(table_index)].p;
       }
       else {
         motor_enable(table_keepEnabled);
@@ -211,10 +216,10 @@ void loop() {
     Serial.println(totalCCWSteps);
 
     if (main_dir == CW) {
-      table_schedule_at(tsched , main_dir = CCW, 1000, 1000,     true);
+      table_schedule_at(tsched , main_dir = CCW, 1600, 1000,     true);
     }
     else {
-      table_schedule_at(tsched , main_dir = CW , 1000, 1000,     true);
+      table_schedule_at(tsched , main_dir = CW , 3200, 1000,     true);
     }
     tsched+=5000;
   }
