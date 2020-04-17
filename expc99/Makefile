@@ -30,9 +30,9 @@ implanta_%: %.hex
 
 # Dependències
 
-main: vaction.o timer.o shielditic.o
+main: vaction.o timer.o motor.o
 main.o: main.c pt.h lc.h lc-switch.h vaction.h pin.h
-motor.o: motor.c pin.h motor.h
+motor.o: motor.c  motor.h
 pin.o: pin.c pin.h
 shielditic.o: shielditic.c shielditic.h
 timer.o: timer.c timer.h

@@ -1,32 +1,81 @@
+#include <avr/io.h>
 #include <util/delay.h>
-#include "pin.h"
 #include "motor.h"
 
 
-typedef enum {m200, m400, m800, m1600} motor_stepsperturn_t;
-typedef enum {motor_a, motor_b} motor_dir_t;
+/*
+ * Configure port and pin corresponding to motor driver.
+ * enable, step, and direction
+ */
+#define ENA_PRT  PORTB
+#define ENA_PIN  0
+#define STP_PRT  PORTD
+#define STP_PIN  2
+#define DIR_PRT  PORTD
+#define DIR_PIN  5
 
 
-static pin_t led;
+/* Macros to get control registers of port */
+#define PORT(x) (x)
+#define DDR(x)  (*(&(x)-1))   // consider DDRy = PORTy - 1
+#define PIN(x)  (*(&(x)-2))   // consider PINy = PORTy - 2
 
 
-void motor_setup(motor_stepsperturn_t s) {
-  led = pin_bind(PORTB, 5, Output);
+/* 
+ * Setup motor module.
+ * Post: motor is prepared; motor disabled; direction wind  
+ */
+void motor_setup(void) {
+  /* config ports as output */
+  DDR(ENA_PRT) |= _BV(ENA_PIN);
+  DDR(STP_PRT) |= _BV(STP_PIN);
+  DDR(DIR_PRT) |= _BV(DIR_PIN);
+  /* set ports default value */
+  PORT(ENA_PRT) &= ~_BV(ENA_PIN);    // motor disabled
+  PORT(STP_PRT) &= ~_BV(STP_PIN);    // step pin low
+  if (motor_wind == 0)               // provision for configuring dir
+    PORT(DIR_PRT) &= ~_BV(DIR_PIN);
+  else
+    PORT(DIR_PRT) |=  _BV(DIR_PIN);
 }
 
-void motor_steps(motor_dir_t d, uint16_t steps) {
-}
-
+/* Order one step. Motor needs to be enabled */
 void motor_step(void) {
-  pin_toggle(led);
+  /* pulse on step pin */
+  PORT(STP_PRT) |= _BV(STP_PIN);
   _delay_us(1);
-  pin_toggle(led);
+  PORT(STP_PRT) &= ~_BV(STP_PIN);
 }
 
+  
+/* Set a given turning direction */
 void motor_set_dir(motor_dir_t d) {
-
+  if (d == 0)               // provision for configuring dir
+    PORT(DIR_PRT) &= ~_BV(DIR_PIN);
+  else
+    PORT(DIR_PRT) |=  _BV(DIR_PIN);
 }
 
+
+/* Reverse the turning direction */
 void motor_reverse(void) {
-
+  PIN(DIR_PRT) |= _BV(DIR_PIN);
 }
+
+
+/*
+ * Enable and disable motor.  
+ * Motor is power feeded only while enabled, thus braking torque 
+ * only effective while enabled. Disabling avoids power consumption.
+ */
+void motor_enable(void) {
+  PORT(ENA_PRT) |= _BV(ENA_PIN);
+}
+
+
+void motor_disable(void) {
+  PORT(ENA_PRT) &= ~_BV(ENA_PIN);
+}  
+
+
+
