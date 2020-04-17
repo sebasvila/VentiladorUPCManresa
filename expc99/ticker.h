@@ -22,7 +22,7 @@ uint16_t ticker_get(void);
 
 /* Get ticker beat in ticks per second */
 inline uint16_t ticker_tps(void) {
-  return 16000000/1024/125;
+  return 16000000/1024/156;
 }
 
 /* Stop ticker counting. */

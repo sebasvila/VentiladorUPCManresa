@@ -15,7 +15,7 @@ void ticker_setup(void) {
   // No interrupts from timer
   TIMSK2 = 0;
   // Count
-  OCR2A = UINT8_C(125);
+  OCR2A = UINT8_C(156);
 }
 
 
