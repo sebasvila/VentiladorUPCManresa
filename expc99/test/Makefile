@@ -9,7 +9,8 @@ VPATH = ..
 
 # Default
 .PHONY: all
-all:	test_timer test_timer2 test_pin test_ticker test_adc
+all:	test_timer test_timer2 test_pin test_ticker test_adc 
+	test_switch_1 test_switch_2 test_switch_3
 
 
 # Utils
@@ -39,6 +40,9 @@ test_ticker: ticker.o shielditic.o
 test_timer2: pin.o timer.o
 test_timer: pin.o timer.o
 test_pin: pin.o
+test_switch_1: switch.o shielditic.o
+test_switch_2: switch.o shielditic.o
+test_switch_3: switch.o shielditic.o ticker.o
 
 motor.o: motor.c pin.h motor.h
 pin.o: pin.c pin.h

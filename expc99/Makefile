@@ -40,4 +40,4 @@ shielditic.o: shielditic.c shielditic.h
 ticker.o: ticker.c ticker.h
 timer.o: timer.c timer.h
 vaction.o: vaction.c pt.h lc.h lc-switch.h timer.h motor.h vaction.h
-
+switch.o: switch.h 
