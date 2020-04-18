@@ -22,7 +22,7 @@ typedef enum {Input, InputPullup, Output} pin_direction_t;
 
 typedef struct {
   volatile uint8_t *port;
-  uint8_t pin;
+  uint8_t mask;  // the mask of the pin
 } pin_t;
 
 
@@ -34,22 +34,22 @@ void pin_w(pin_t p, bool v);
 
 /* Read and return value `v` in pin `p` */
 inline bool pin_r(pin_t p) {
-  return PIN(p.port) & _BV(p.pin);
+  return PIN(p.port) & p.pin;
 }
 
 /* Sets pin `p` to true */
 inline void pin_set_true(pin_t p) {
-  PORT(p.port) |= _BV(p.pin);
+  PORT(p.port) |= p.pin;
 }
 
 /* Sets pin `p` to false */
 inline void pin_set_false(pin_t p) {
-    PORT(p.port) &= ~_BV(p.pin);
+  PORT(p.port) &= ~(p.pin);
 }
 
 /* Toggles value in pin `p` */
 inline void pin_toggle(pin_t p) {
-  PIN(p.port) |= _BV(p.pin);
+  PIN(p.port) |= (p.pin);
 }
 
 /* Destroy and unbind the pin */

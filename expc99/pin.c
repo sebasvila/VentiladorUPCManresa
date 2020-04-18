@@ -14,23 +14,23 @@
 pin_t pin_bind(volatile uint8_t *port, uint8_t pin, pin_direction_t d) {
   pin_t p;
   
-  // Setup pin `p`
+  /* Construct `pin_t` object.
+   * `p`. `p.pin` stores the mask of the pin */
   p.port = port;
-  p.pin = pin;
-  // set port pin direction
+  p.pin = _BV(pin);
+  /* configure port+pin direction */
   switch (d) {
   case Output:
-    DDR(port) |= _BV(pin);
-    // set port pin low  	
-    PORT(port) &= ~_BV(pin);
+    DDR(port)  |=  p.pin;
+    PORT(port) &= ~p.pin;     // pin low by default
     break;
   case Input:
-    DDR(port) &= ~_BV(pin);
+    DDR(port)  &= ~p.pin;
+    PORT(port) &= ~p.pin;     // pull up inactive
     break;
   case InputPullup:
-    DDR(port) &= ~_BV(pin);
-    // set port pin high (activate pull up)
-    PORT(port) |= _BV(pin);
+    DDR(port)  &= ~p.pin;
+    PORT(port) |=  p.pin;     // pull up active
     break;
   }
   return p;
@@ -44,7 +44,6 @@ inline bool pin_r(pin_t p);
 
 void pin_toggle(pin_t p);
 
-
 void pin_w(pin_t p, bool v) {
   if (v) 
     pin_set_true(p);
@@ -54,8 +53,10 @@ void pin_w(pin_t p, bool v) {
 
 
 void pin_unbind(pin_t *const p) {
-  DDR(p->port) &= ~_BV(p->pin);
-  PORT(p->port) &= ~_BV(p->pin);
+  /* restore port+pin to output mode and low value */
+  DDR(p->port)  &= ~(p->pin);
+  PORT(p->port) &= ~(p->pin);
+  /* next operation will fail unless `p` bound again */
   p->port = NULL;
 }
 
