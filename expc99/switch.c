@@ -74,7 +74,7 @@ static void timer_setup(void) {
   // Select 1024 prescaler and start counting
   TCCR0B |=  _BV(CS02) | _BV(CS00);
   // Count
-  OCR0A = UINT8_C(156); // almost 10 ms
+  OCR0A = UINT8_C(78); // 5ms sampling period
 }
 
 
@@ -174,7 +174,7 @@ void switch_unbind(switch_t i) {
  * Non-blocking queries
  */
 
-void switch_ask(switch_t i) {
+void switch_poll(switch_t i) {
   swt.t[i].sampling = 1;
   if (swt.on_sampling == 0) enable_timer();
   swt.on_sampling++;
@@ -184,7 +184,7 @@ bool switch_ready(switch_t i) {
   return swt.t[i].sampling == 0;
 }
 
-bool switch_get(switch_t i) {
+bool switch_state(switch_t i) {
   return swt.t[i].state;
 }
 
@@ -192,22 +192,11 @@ bool switch_changed(switch_t i) {
   return swt.t[i].changed;
 }
 
-
-/*
- * Blocking queries 
- */
-
-bool switch_get_blk(switch_t i) {
-  switch_ask(i);
+void switch_poll_wait(switch_t i) {
+  switch_poll(i);
   while (!switch_ready(i));
-  return switch_get(i);
 }
 
-bool switch_changed_blk(switch_t i) {
-  switch_ask(i);
-  while (!switch_ready(i));
-  return switch_changed(i);
-}
 
 
 

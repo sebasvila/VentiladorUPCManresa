@@ -70,16 +70,16 @@ PT_THREAD(switch_pot(struct pt *pt))
   for(;;) {
     /* read up button */
     if (offset < MAX) {
-      switch_ask(s1);
+      switch_poll(s1);
       PT_WAIT_UNTIL(pt, switch_ready(s1));
-      if (switch_get(s1)) offset++;
+      if (switch_state(s1)) offset++;
     }
 
     /* read down button */
     if (offset > MIN) {
-      switch_ask(s2);
+      switch_poll(s2);
       PT_WAIT_UNTIL(pt, switch_ready(s2));
-      if (switch_get(s2)) offset--;
+      if (switch_state(s2)) offset--;
     }
 
     /* polling time of switches */
@@ -115,5 +115,6 @@ int main(void) {
   for(;;) {
     (void)PT_SCHEDULE(sem(&sem_ctx));
     (void)PT_SCHEDULE(switch_pot(&switch_pot_ctx));
+    led_toggle(semaph2, green);
   }
 }

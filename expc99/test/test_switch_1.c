@@ -17,10 +17,13 @@ int main() {
   s2 = switch_bind(&PORTD, 2);
 
   for(;;) {
-    
-    if (switch_get_blk(s1))
+
+    switch_poll_wait(s1);
+    if (switch_state(s1))
       led_on(semaph2, red);
-    if (switch_get_blk(s2))
+
+    switch_poll_wait(s2);
+    if (switch_state(s2))
       led_off(semaph2, red);
 
     _delay_ms(50);

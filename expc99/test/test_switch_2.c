@@ -69,9 +69,12 @@ int main() {
   rotate(0);
 
   for(;;) {
-    
-    if (switch_get_blk(s1) && switch_changed(s1)) rotate(1);
-    if (switch_get_blk(s2) && switch_changed(s2)) rotate(0);
+
+    switch_poll(s1);
+    if (switch_state(s1) && switch_changed(s1)) rotate(1);
+
+    switch_poll(s2);
+    if (switch_state(s2) && switch_changed(s2)) rotate(0);
     _delay_ms(50);
   }
 
