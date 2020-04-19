@@ -16,12 +16,13 @@
  */
 
 #include <stdint.h>
+#include <stdlib.h>
 
 /* `switch_t` is a handler to internal switch */
-typedef int8_t switch_t;
+typedef void* switch_t;
 
 /* Some functions can return error */
-#define SWITCH_ERR ((switch_t)-1)
+#define SWITCH_ERR NULL
 
 /* setup the module */
 void switch_setup(void);

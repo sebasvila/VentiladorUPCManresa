@@ -28,7 +28,7 @@
  **************************************************/
 
 /* internal switch representation */
-typedef struct {
+typedef volatile struct {
   volatile uint8_t *port;
   uint8_t pin_mask;
   uint8_t d_history;        // debouncing history
@@ -39,9 +39,9 @@ typedef struct {
 } sw_t;
 
 /* table of currently bound switches */
-volatile static struct {
+static struct {
   sw_t    t[MAX_SWITCH];
-  uint8_t on_sampling;
+  volatile uint8_t on_sampling;
 }swt;
 
 static void empty_table(void) {
@@ -128,28 +128,30 @@ switch_t switch_bind(volatile uint8_t *port, uint8_t pin) {
   /* allocate a slot */
   int8_t i = get_free_slot();
   if (i<0) return SWITCH_ERR;
+  sw_t *slot = &(swt.t[i]);     // get a pointer to the slot
   /* initialize the slot */
-  swt.t[i].used = 1;
-  swt.t[i].sampling = 0;
-  swt.t[i].state = 0;         // assume switch was low
-  swt.t[i].changed = 0;
-  swt.t[i].port = port;
-  swt.t[i].pin_mask  = _BV(pin);
+  slot->used = 1;
+  slot->sampling = 0;
+  slot->state = 0;         // assume switch was low
+  slot->changed = 0;
+  slot->port = port;
+  slot->pin_mask  = _BV(pin);
   /* configure port as input with pullup active */
   DDR(port)  &= ~_BV(pin);
   PORT(port) |=  _BV(pin);  // pull up active
 
-  return i;
+  return (void *)slot;
 }
   
 
 void switch_unbind(switch_t i) {
+  sw_t *slot = i;
   /* check if bound */
-  if (!swt.t[i].used) return;
+  if (!slot->used) return;
   /* configure port as output in low state */
-  DDR(swt.t[i].port)  |=  swt.t[i].pin_mask ; // NEEDS CHECK
+  DDR(slot->port)  |=  slot->pin_mask ; // NEEDS CHECK
                                               // possible shortcircuit?
-  PORT(swt.t[i].port) &= ~swt.t[i].pin_mask;
+  PORT(slot->port) &= ~slot->pin_mask;
   /* 
    * if in sampling mode: deactivate 
    * ATOMIC block because timer interrupt can alter preconditions
@@ -159,14 +161,14 @@ void switch_unbind(switch_t i) {
    * Would be clever to disable only timer.
    */
   ATOMIC_BLOCK(ATOMIC_FORCEON) {
-    if (swt.t[i].sampling) {
+    if (slot->sampling) {
       // force invariant: not used => not sampling
-      swt.t[i].sampling = 0; 
+      slot->sampling = 0; 
       if (--swt.on_sampling == 0) disable_timer();
     }
   }
   /* free slot */
-  swt.t[i].used = 0;
+  slot->used = 0;
 }
 
 
@@ -175,21 +177,21 @@ void switch_unbind(switch_t i) {
  */
 
 void switch_poll(switch_t i) {
-  swt.t[i].sampling = 1;
+  ((sw_t *)i)->sampling = 1;
   if (swt.on_sampling == 0) enable_timer();
   swt.on_sampling++;
 }
 
 bool switch_ready(switch_t i) {
-  return swt.t[i].sampling == 0;
+  return ((sw_t *)i)->sampling == 0;
 }
 
 bool switch_state(switch_t i) {
-  return swt.t[i].state;
+  return ((sw_t *)i)->state;
 }
 
 bool switch_changed(switch_t i) {
-  return swt.t[i].changed;
+  return ((sw_t *)i)->changed;
 }
 
 void switch_poll_wait(switch_t i) {
