@@ -173,5 +173,7 @@ int main(void) {
     (void)PT_SCHEDULE(ui_pot(&pot_ctx));
     /* red led to show free time of scheduler */
     led_toggle(semaph2, red);
+    _delay_ms(0.5);
+    led_toggle(semaph2, red);
   }
 }
