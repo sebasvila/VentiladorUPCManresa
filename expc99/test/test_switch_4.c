@@ -81,9 +81,9 @@ PT_THREAD(ui_pot(struct pt *pt))
     PT_WAIT_UNTIL(pt, switch_ready(s2));
     if (switch_state(s2) && switch_changed(s2)) {
       /* read potentiometer and set parameter */
-      adc_start_reading(1);
-      PT_WAIT_UNTIL(pt, adc_read_finished());
-      v = MIN +	(((MAX-MIN) * adc_get_read()) >> 10);
+      adc_start_conversion(1);
+      PT_WAIT_WHILE(pt, adc_converting());
+      v = MIN +	(((MAX-MIN) * adc_get()) >> 10);
       if (state == 0)
 	nt = v;
       else

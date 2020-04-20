@@ -59,9 +59,9 @@ PT_THREAD(pot(struct pt *pt))
 
   for(;;) {
     /* non-blocking adc read from shield itic potentiometer (ch 1) */
-    adc_start_reading(1);
-    PT_WAIT_UNTIL(pt, adc_read_finished());
-    offset = adc_get_read() / ((1<<10)*2/ticker_tps());
+    adc_start_conversion(1);
+    PT_WAIT_WHILE(pt, adc_converting());
+    offset = adc_get() / ((1<<10)*2/ticker_tps());
 
     /* polling time of potentiometer */
     chronos = ticker_get();
@@ -90,7 +90,7 @@ int main(void) {
   PT_INIT(&pot_ctx);
 
   /* read initial position of potentiometer */
-  offset = adc_read(1)/((1<<9)*2/(ticker_tps()));
+  offset = adc_wait_get(1)/((1<<9)*2/(ticker_tps()));
   
   /* do schedule of threads */
   for(;;) {
