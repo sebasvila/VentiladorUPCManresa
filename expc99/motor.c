@@ -43,7 +43,7 @@ void motor_setup(void) {
 void motor_step(void) {
   /* pulse on step pin */
   PORT(STP_PRT) |= _BV(STP_PIN);
-  _delay_us(1);
+  _delay_us(2);
   PORT(STP_PRT) &= ~_BV(STP_PIN);
 }
 
