@@ -19,13 +19,7 @@ from myconfig import *
 #  mqtt_password = 'password'
 #  mqtt_port = 0
 
-client_id = ubinascii.hexlify(machine.unique_id())
-topic_sub = b'notification'
-topic_pub = b'test'
 
-last_message = 0
-message_interval = 0.1
-counter = 0
 
 station = network.WLAN(network.STA_IF)
 

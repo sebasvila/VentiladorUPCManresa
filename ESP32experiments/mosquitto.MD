@@ -113,6 +113,8 @@ The **sender** is an ESP32, implemented via a [boot.py](https://github.com/PereP
 TODO: a **sender** script, to allow testing
 Added a sender that sends mqtt packets, [mqtt_sender.py](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/mqtt_sender.py)
 
+UPDATE: A **sender script** is [here](https://github.com/PerePala/VentiladorUPCManresa/blob/master/ESP32experiments/mqtt_sender.py)
+
 # Monitoring the packets
 
 ```
