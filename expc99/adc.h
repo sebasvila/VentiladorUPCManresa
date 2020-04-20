@@ -23,7 +23,9 @@ uint16_t adc_read(uint8_t ch);
  * issued.
  */
 void adc_start_reading(uint8_t ch);
-inline bool adc_read_finished(void) {return ADCSRA & _BV(ADSC);}
-inline uint16_t adc_get_read(void) {return ADC;}
+bool adc_read_finished(void);
+uint16_t adc_get_read(void);
+
+
 
 #endif

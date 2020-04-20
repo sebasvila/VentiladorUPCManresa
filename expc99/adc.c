@@ -4,6 +4,9 @@
 
 uint16_t adc_read(uint8_t ch)
 {
+  /* avoid overreads */
+  while (ADCSRA & _BV(ADSC));
+	 
   // select the corresponding channel 0~7
   // ANDing with ’7′ will always keep the value
   // of ‘ch’ between 0 and 7
@@ -25,6 +28,9 @@ uint16_t adc_read(uint8_t ch)
 
 
 void adc_start_reading(uint8_t ch) {
+  /* avoid overreads */
+  while (ADCSRA & _BV(ADSC));
+
   // select the corresponding channel 0~7
   // ANDing with ’7′ will always keep the value
   // of ‘ch’ between 0 and 7
@@ -37,18 +43,26 @@ void adc_start_reading(uint8_t ch) {
 }
 
  
-  
-extern bool adc_read_finished(void);
-extern uint16_t adc_get_read(void);
+bool adc_read_finished(void) {
+  return !(ADCSRA & _BV(ADSC));
+}
 
+
+uint16_t adc_get_read(void) {
+  return ADC;
+}
+ 
 
 void adc_setup(void) {
-    // AREF = AVcc
-    ADMUX = _BV(REFS0);
+  /* disable power reduction for ADC */
+  PRR &= ~_BV(PRADC);
+
+  // AREF = AVcc
+  ADMUX = _BV(REFS0);
  
-    // ADC Enable and prescaler of 128
-    // 16000000/128 = 125000
-    ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);
+  // ADC Enable and prescaler of 128
+  // 16000000/128 = 125000
+  ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);
 }
 
 
