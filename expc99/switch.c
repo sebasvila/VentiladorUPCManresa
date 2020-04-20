@@ -177,9 +177,13 @@ void switch_unbind(switch_t i) {
  */
 
 void switch_poll(switch_t i) {
-  ((sw_t *)i)->sampling = 1;
-  if (swt.on_sampling == 0) enable_timer();
-  swt.on_sampling++;
+  if (((sw_t *)i)->sampling == 0) {
+    ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    ((sw_t *)i)->sampling = 1;
+      if (swt.on_sampling == 0) enable_timer();
+      swt.on_sampling++;
+    }
+  }
 }
 
 bool switch_ready(switch_t i) {
@@ -196,7 +200,7 @@ bool switch_changed(switch_t i) {
 
 void switch_poll_wait(switch_t i) {
   switch_poll(i);
-  while (!switch_ready(i));
+  while (((sw_t *)i)->sampling);
 }
 
 

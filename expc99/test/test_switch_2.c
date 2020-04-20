@@ -75,6 +75,7 @@ int main() {
 
     switch_poll(s2);
     if (switch_state(s2) && switch_changed(s2)) rotate(0);
+
     _delay_ms(50);
   }
 

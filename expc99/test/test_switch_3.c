@@ -5,6 +5,7 @@
 #include <avr/io.h> 
 #include <util/delay.h>
 #include "pt.h"
+#include "pt-delay.h"
 #include "ticker.h"
 #include "shielditic.h"
 #include "switch.h"
@@ -20,8 +21,6 @@ static uint16_t offset;
  */
 PT_THREAD(sem(struct pt *pt))
 {
-  static uint16_t chronos;
-
   PT_BEGIN(pt);
 
   for(;;) {
@@ -30,19 +29,16 @@ PT_THREAD(sem(struct pt *pt))
      * To cope with ticker overflow: compare always duration, not
      * timestamp
      */
-    chronos = ticker_get();
-    PT_WAIT_WHILE(pt, ticker_get() - chronos <= offset);
+    PT_DELAY(pt, offset);
     led_toggle(semaph1, green);
     
     led_toggle(semaph1, yellow);
-    chronos = ticker_get();
-    PT_WAIT_WHILE(pt, ticker_get() - chronos <= offset);
+    PT_DELAY(pt, offset);
     led_toggle(semaph1, yellow);
     
     led_toggle(semaph1, red);
-    chronos = ticker_get();
     /* a `<=` guarantees that thread yields although offset == 0 */
-    PT_WAIT_WHILE(pt, ticker_get() - chronos <= offset);
+    PT_DELAY(pt, offset);
     led_toggle(semaph1, red);
   }
   
@@ -59,7 +55,6 @@ PT_THREAD(sem(struct pt *pt))
 PT_THREAD(switch_pot(struct pt *pt))
 {
   static switch_t s1, s2;
-  static uint16_t chronos;
   
   PT_BEGIN(pt);
 
@@ -83,8 +78,7 @@ PT_THREAD(switch_pot(struct pt *pt))
     }
 
     /* polling time of switches */
-    chronos = ticker_get();
-    PT_WAIT_WHILE(pt, ticker_get()-chronos < 10);
+    PT_DELAY(pt, 10);
   }
 
   PT_END(pt);

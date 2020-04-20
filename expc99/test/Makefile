@@ -43,6 +43,7 @@ test_pin: pin.o
 test_switch_1: switch.o shielditic.o
 test_switch_2: switch.o shielditic.o
 test_switch_3: switch.o shielditic.o ticker.o
+test_switch_4: switch.o shielditic.o ticker.o adc.o
 
 motor.o: motor.c pin.h motor.h
 pin.o: pin.c pin.h
@@ -52,3 +53,5 @@ vaction.o: vaction.c pt.h lc.h lc-switch.h timer.h pin.h shielditic.h \
  vaction.h
 ticker.o: ticker.h
 adc.o: adc.h
+test_switch_3.o: pt.h pt-delay.h
+test_switch_4.o: pt.h pt-delay.h
