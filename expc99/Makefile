@@ -1,8 +1,25 @@
+PLATFORM=ArduinoMEGA
+
 DEVICE=/dev/ttyACM0
+
 CC=avr-gcc
-CPPFLAGS=-DF_CPU=16000000UL -I.
-CFLAGS=-Wall -std=c99 -Os -mmcu=atmega328p -fshort-enums
-LDFLAGS=-std=c99 -mmcu=atmega328p
+CPPFLAGS=-DF_CPU=16000000UL -D$(PLATFORM) -I.
+CFLAGS=-Wall -std=c99 -Os -mmcu=$(MCU) -fshort-enums
+LDFLAGS=-std=c99 -mmcu=$(MCU)
+
+# Platform dependent parameters
+ifeq ($(PLATFORM),ArduinoONE)
+MCU=atmega328p
+PROGRAMMER=arduino
+DUDEOPTS=
+else ifeq ($(PLATFORM),ArduinoMEGA)
+MCU=atmega2560
+PROGRAMMER=wiring
+DUDEOPTS=-D
+endif
+
+
+
 
 SOURCES = adc.c motor.c shielditic.c ticker.c vaction.c \
           main.c pin.c switch.c timer.c \
@@ -32,7 +49,7 @@ veryclean: clean
 	avr-objcopy -Oihex  $< $@
 
 implanta_%: %.hex
-	avrdude -c arduino -p atmega328p -P $(DEVICE) -U $<
+	avrdude $(DUDEOPTS) -c $(PROGRAMMER) -p $(MCU) -P $(DEVICE) -U $<
 
 %.s: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -S $<

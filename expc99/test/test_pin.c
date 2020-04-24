@@ -10,12 +10,18 @@
 
 
 int main() {
-  const pin_t led = pin_bind(&PORTB, 5, Output);
+#if defined(ArduinoONE)
+  pin_t led = pin_bind(&PORTB, 5, Output);
+#elif defined(ArduinoMEGA)
+  pin_t led = pin_bind(&PORTB, 7, Output);
+#endif
 
-  //  _delay_ms(1000);
-  pin_set_true(led);
-  //  _delay_ms(1000);
-  pin_set_false(led);
+  for(;;) {
+    _delay_ms(1000);
+    pin_set_true(led);
+    _delay_ms(1000);
+    pin_set_false(led);
+  }
 
   return 0;
 }
