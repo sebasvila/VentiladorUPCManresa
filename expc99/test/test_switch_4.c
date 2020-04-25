@@ -64,16 +64,18 @@ PT_THREAD(sem(struct pt *pt))
  *  Polls the potentiometer and changes parameter
  *  according to state when s2 pushed.
  */
-#define MAX INT32_C(300)
-#define MIN INT32_C(1)
+#define MAX 300
+#define MIN 1
 PT_THREAD(ui_pot(struct pt *pt))
 {
   static switch_t s2;
   static uint16_t v;
+  static adc_channel pot;
   
   PT_BEGIN(pt);
 
   s2 = switch_bind(&PORTD, 2); // down
+  pot = adc_bind(1, Vcc);
   
   for(;;) {
     /* read pushbutton s2 */
@@ -81,9 +83,10 @@ PT_THREAD(ui_pot(struct pt *pt))
     PT_WAIT_UNTIL(pt, switch_ready(s2));
     if (switch_state(s2) && switch_changed(s2)) {
       /* read potentiometer and set parameter */
-      adc_start_conversion(1);
+      adc_start_conversion(pot);
       PT_WAIT_WHILE(pt, adc_converting());
-      v = MIN +	(((MAX-MIN) * adc_get()) >> 10);
+      v = ADC_VALUE(adc_get(), MAX, MIN);
+      //v = adc_get()/2;
       if (state == 0)
 	nt = v;
       else

@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include "pt.h"
+#include "pt-delay.h"
 #include "ticker.h"
 #include "shielditic.h"
 #include "adc.h"
@@ -53,19 +54,20 @@ PT_THREAD(sem(struct pt *pt))
  */
 PT_THREAD(pot(struct pt *pt))
 {
-  static uint16_t chronos;
-  
+  static adc_channel ch;
+
   PT_BEGIN(pt);
 
+  ch = adc_bind(1, Vcc);
+  
   for(;;) {
     /* non-blocking adc read from shield itic potentiometer (ch 1) */
-    adc_start_conversion(1);
+    adc_start_conversion(ch);
     PT_WAIT_WHILE(pt, adc_converting());
-    offset = adc_get() / ((1<<10)*2/ticker_tps());
-
+    offset = adc_get() / 2;
+    
     /* polling time of potentiometer */
-    chronos = ticker_get();
-    PT_WAIT_WHILE(pt, ticker_get()-chronos < ticker_tps()/10u);
+    PT_DELAY(pt, 3);
   }
 
   PT_END(pt);
@@ -90,7 +92,7 @@ int main(void) {
   PT_INIT(&pot_ctx);
 
   /* read initial position of potentiometer */
-  offset = adc_wait_get(1)/((1<<9)*2/(ticker_tps()));
+  offset = 100;
   
   /* do schedule of threads */
   for(;;) {

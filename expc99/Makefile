@@ -1,4 +1,4 @@
-PLATFORM=ArduinoMEGA
+PLATFORM=ArduinoONE
 
 DEVICE=/dev/ttyACM0
 
