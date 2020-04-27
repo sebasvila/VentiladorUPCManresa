@@ -55,7 +55,7 @@ void adc_start_conversion(adc_channel ch) {
     if (M_CH(ch) != M_CH(last_conversion)) {
       /* must change physical channel */
       ADMUX = (ADMUX &  0370) | M_CH(ch);
-      /* wait enough */
+      /* wait if needed */
     } 
     /* update last conversion */
     last_conversion = ch;
@@ -113,8 +113,10 @@ void adc_setup(void) {
    * `last_conversion`, and waits for first unusually long reading
    * time (25 cycles, pp. 208 datasheet).  Force to select an
    * yet unused channel and reference voltage.
+   * As a lateral effect it sets up the `last_conversion` private
+   * module attribute.
    */
-  (void)adc_wait_get(C_ADC(1,1));
+  (void)adc_wait_get(C_ADC(1,Int11));
 }
 
 

@@ -23,7 +23,7 @@
  * If Aref is connected, other sources should be avoided
  * (¶23.5.2 pp. 211 datasheet)
  */
-typedef enum {Aref=0, Vcc=1, I11=3} adc_ref;
+typedef enum {Aref=0, Vcc=1, Int11=3} adc_ref;
 
 /* An adc channel proxy object */
 typedef uint8_t adc_channel;
@@ -48,6 +48,25 @@ uint8_t adc_wait_get(adc_channel ch);
 void adc_start_conversion(adc_channel ac);
 bool adc_converting(void);
 uint8_t adc_get(void);
+
+
+/*
+ * Adjust channel range.
+ * When Vcc external reference is used, this function can be used to
+ * calibrate against the internal 1.1V reference. The function returns
+ * the real voltage corresponding to Vcc. 
+ */
+// float adc_adjust(void); not implemented yet
+
+
+/*
+ * Oversampling conversion.
+ * Four continuous measures of the same channel are made and the 
+ * mean returned. Measuring span is of 13.5*4=54 cycles, approx.
+ * 108 us.
+ * Function blocks until read done.
+ */
+//uint16_t adc_oversample(adc_channel ch); unimplemented yet
 
 
 /* initialize the module */
