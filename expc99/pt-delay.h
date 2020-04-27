@@ -42,7 +42,7 @@
     p = time;					\
     from = ticker_get();			\
     LC_SET((pt)->lc);				\
-    if( (ticker_get() - from <= (time)) ) {	\
+    if( (ticker_get() - from <= p) ) {	\
       return PT_WAITING;			\
     }						\
   } while(0)
