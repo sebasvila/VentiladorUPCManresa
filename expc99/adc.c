@@ -128,8 +128,9 @@ bool adc_oversampling(void) {
 
 
 uint8_t adc_get_oversample(void) {
-  /* divide and round */
-  if( (sample_sum & (N_SAMPLES-1)) >= N_SAMPLES/2)
+  /* check fractional part: if most significant bit of fractional part
+     is set, then add 1 to round-up */
+  if (sample_sum & (N_SAMPLES >> 1))
     return sample_sum / N_SAMPLES + 1;
   else
     return sample_sum / N_SAMPLES;
