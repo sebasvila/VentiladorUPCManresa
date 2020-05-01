@@ -3,7 +3,7 @@
 
 
 /* remembers last conversion done */
-static adc_channel last_conversion;
+static adc_channel last_channel_used;
 
 /*
  * adc_channel internal representation:
@@ -46,19 +46,19 @@ void adc_unbind(adc_channel *const ch) {
 
 void adc_start_conversion(adc_channel ch) {
   /* test if same enviroment that last conversion */
-  if (ch != last_conversion) {
-    if (M_RE(ch) != M_RE(last_conversion)) {
+  if (ch != last_channel_used) {
+    if (M_RE(ch) != M_RE(last_channel_used)) {
       /* must change reference source */
       ADMUX = (ADMUX & 077) | M_RE(ch);
       /* wait if needed */
     }
-    if (M_CH(ch) != M_CH(last_conversion)) {
+    if (M_CH(ch) != M_CH(last_channel_used)) {
       /* must change physical channel */
       ADMUX = (ADMUX &  0360) | M_CH(ch);
       /* wait if needed */
     } 
     /* update last conversion */
-    last_conversion = ch;
+    last_channel_used = ch;
   }
   
   /* avoid overreads */
@@ -108,13 +108,14 @@ void adc_setup(void) {
   /* ADC enable */
   ADCSRA |= _BV(ADEN);
   /* set module state: last adc_channel converted is none */
-  last_conversion = 0x0;
+  last_channel_used = 0x0;
   /* force and discard very first read.  This sets up
-   * `last_conversion`, and waits for first unusually long reading
+   * `last_channel_used`, and waits for first unusually long reading
    * time (25 cycles, pp. 208 datasheet).  Force to select an
    * yet unused channel and reference voltage.
-   * As a lateral effect it sets up the `last_conversion` private
+   * As a lateral effect it sets up the `last_channel_used` private
    * module attribute.
+   * use internal channel to avoid potential conflicts.
    */
   (void)adc_wait_get(C_ADC(ADC_CHANNEL_11V,Int11));
 }
