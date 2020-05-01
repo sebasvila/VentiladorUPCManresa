@@ -59,10 +59,11 @@ PT_THREAD(pot(struct pt *pt))
   PT_BEGIN(pt);
 
   ch = adc_bind(1, Vcc);
+  adc_prepare(ch);
   
   for(;;) {
     /* non-blocking adc read from shield itic potentiometer (ch 1) */
-    adc_start_conversion(ch);
+    adc_start_conversion();
     PT_WAIT_WHILE(pt, adc_converting());
     offset = adc_get() / 2;
     

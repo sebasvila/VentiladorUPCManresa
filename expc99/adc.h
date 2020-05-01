@@ -30,8 +30,12 @@
  */
 typedef enum {Aref=0, Vcc=1, Int11=3} adc_ref;
 
+
+
 /* An adc channel proxy object */
 typedef uint8_t adc_channel;
+
+
 
 /* Bind channel to a given port and reference voltage source */
 adc_channel adc_bind(uint8_t ch, adc_ref ref);
@@ -39,20 +43,38 @@ adc_channel adc_bind(uint8_t ch, adc_ref ref);
 /* Unbind channel and */
 void adc_unbind(adc_channel *const ch);
 		     
-/* read from adc channel `ac` until read done.  Typical about 30us of
- * waiting time. Longuer waiting time if it needs to change physical
- * channel and/or reference voltage from last conversion.
- */
-uint8_t adc_wait_get(adc_channel ch);
 
 /* non-blocking read set of calls. Should be used with utmost care
  * because hardware do not allows simultaneously reading for more than
  * one physical channel. Thus, during conversion time no other read
  * should be issued.
  */
-void adc_start_conversion(adc_channel ac);
+
+/* prepare to convert from channel `ch` */
+void adc_prepare(adc_channel ch);
+
+/* start to read from last prepared channel */
+void adc_start_conversion(void);
+
+/* prepare to convert from channel `ch` and start a conversion */
+void adc_prepare_start(adc_channel ch);
+
+/* true iff last started conversion is running */
 bool adc_converting(void);
+
+/* get the value of the last started conversion */
 uint8_t adc_get(void);
+
+
+
+/* read from adc channel `ac` until read done.  Typically about 30us
+ * of waiting time. Longuer waiting time if it needs to change
+ * physical channel and/or reference voltage from last conversion.
+ */
+uint8_t adc_prep_start_get(adc_channel ch);
+
+
+
 
 
 /*
@@ -71,7 +93,7 @@ uint8_t adc_get(void);
  * 108 us.
  * Function blocks until read done.
  */
-//uint16_t adc_oversample(adc_channel ch);
+//uint8_t adc_oversample(adc_channel ch);
 //unimplemented yet
 
 

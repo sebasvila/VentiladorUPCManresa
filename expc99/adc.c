@@ -44,7 +44,8 @@ void adc_unbind(adc_channel *const ch) {
 }
 
 
-void adc_start_conversion(adc_channel ch) {
+
+void adc_prepare(adc_channel ch) {
   /* test if same enviroment that last conversion */
   if (ch != last_channel_used) {
     if (M_RE(ch) != M_RE(last_channel_used)) {
@@ -60,12 +61,21 @@ void adc_start_conversion(adc_channel ch) {
     /* update last conversion */
     last_channel_used = ch;
   }
-  
+}
+
+
+void adc_start_conversion(void) {
   /* avoid overreads */
   while (ADCSRA & _BV(ADSC));
 
-  /* start single convertion: write ’1′ to ADSC */
+  /* start single conversion: write ’1′ to ADSC */
   ADCSRA |= _BV(ADSC);
+}
+
+
+void adc_prepare_start(adc_channel ch) {
+  adc_prepare(ch);
+  adc_start_conversion();
 }
 
  
@@ -79,9 +89,9 @@ uint8_t adc_get(void) {
 }
  
 
-uint8_t adc_wait_get(adc_channel ch)
+uint8_t adc_prep_start_get(adc_channel ch)
 {
-  adc_start_conversion(ch);
+  adc_prepare_start(ch);
   while (adc_converting());
   return adc_get();
 }
@@ -117,7 +127,7 @@ void adc_setup(void) {
    * module attribute.
    * use internal channel to avoid potential conflicts.
    */
-  (void)adc_wait_get(C_ADC(ADC_CHANNEL_11V,Int11));
+  (void)adc_prep_start_get(C_ADC(ADC_CHANNEL_11V,Int11));
 }
 
 
