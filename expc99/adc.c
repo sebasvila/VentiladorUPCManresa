@@ -1,8 +1,12 @@
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "adc.h"
 
 
-/* remembers last conversion done */
+/* number of samples in oversampling (2's power) */
+#define N_SAMPLES 4
+
+/* remembers last channel used */
 static adc_channel last_channel_used;
 
 /*
@@ -23,8 +27,6 @@ static adc_channel last_channel_used;
 #define M_CH(x) (x & 017)                 /* masked channel number */
 #define M_RE(x) (x & 0300)                /* masked reference voltage */
 #define C_ADC(c,r) (c|r<<6)               /* adc_channel constructor */
-
-
 
 
 
@@ -99,6 +101,51 @@ uint8_t adc_prep_start_get(adc_channel ch)
 
 
 
+/*********************************************************
+ * Oversampling read
+ *********************************************************/
+static uint16_t sample_sum;
+static uint8_t num_samples;
+
+
+void adc_start_oversample(void) {
+  sample_sum = 0;
+  num_samples = 0;
+  /* enable trigger mode and enable interrupts */
+  ADCSRA |= _BV(ADATE) | _BV(ADIE);
+
+  /* avoid overreads */
+  while (ADCSRA & _BV(ADSC));
+
+  /* start conversions */
+  ADCSRA |= _BV(ADSC);
+}
+
+
+bool adc_oversampling(void) {
+  return num_samples != N_SAMPLES;
+}
+
+
+uint8_t adc_get_oversample(void) {
+  /* divide and round */
+  if( (sample_sum & (N_SAMPLES-1)) >= N_SAMPLES/2)
+    return sample_sum / N_SAMPLES + 1;
+  else
+    return sample_sum / N_SAMPLES;
+}
+
+
+ISR(ADC_vect) {
+  sample_sum += ADCH;
+  if (++num_samples == N_SAMPLES) {
+    /* no more sampling */
+    /* disable trigger mode and disable interrupts */
+    ADCSRA &= ~(_BV(ADATE) | _BV(ADIE));
+  }
+}
+
+
 
 
 void adc_setup(void) {
@@ -117,6 +164,8 @@ void adc_setup(void) {
   ADMUX = _BV(ADLAR);
   /* ADC enable */
   ADCSRA |= _BV(ADEN);
+  /* set trigger source to interrupt flag (for oversampling) */
+  ADCSRB &= ~(_BV(ADTS2) | _BV(ADTS1) | _BV(ADTS0));
   /* set module state: last adc_channel converted is none */
   last_channel_used = 0x0;
   /* force and discard very first read.  This sets up

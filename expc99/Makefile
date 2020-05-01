@@ -23,8 +23,11 @@ endif
 
 SOURCES = adc.c motor.c shielditic.c ticker.c vaction.c \
           main.c pin.c switch.c timer.c \
-	  test_timer.c test_timer2.c test_pin.c test_ticker.c test_adc.c \
-	  test_switch_1.c test_switch_2.c test_switch_3.c
+	  test_timer.c test_timer2.c \
+          test_pin.c \
+          test_ticker.c \
+	  test_adc.c test_adc_2.c \
+          test_switch_1.c test_switch_2.c test_switch_3.c
 
 vpath %.c test
 
@@ -63,6 +66,7 @@ implanta_%: %.hex
 # Link rules
 main: vaction.o timer.o motor.o
 test_adc: adc.o ticker.o shielditic.c
+test_adc_2: adc.o ticker.o shielditic.c
 test_ticker: ticker.o shielditic.o
 test_timer: pin.o timer.o
 test_timer2: pin.o timer.o

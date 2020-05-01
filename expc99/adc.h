@@ -91,10 +91,10 @@ uint8_t adc_prep_start_get(adc_channel ch);
  * Four continuous measures of the same channel are made and the 
  * mean returned. Measuring span is of 13.5*4=54 cycles, approx.
  * 108 us.
- * Function blocks until read done.
  */
-//uint8_t adc_oversample(adc_channel ch);
-//unimplemented yet
+void adc_start_oversample(void);
+bool adc_oversampling(void);
+uint8_t adc_get_oversample(void);
 
 
 /* initialize the module */
