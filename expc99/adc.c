@@ -7,22 +7,22 @@ static adc_channel last_conversion;
 
 /*
  * adc_channel internal representation:
- * - bits [0-2] hardware channel number
- * - bits [3-5] reserved
+ * - bits [0-3] hardware channel number
+ * - bits [4-5] reserved
  * - bits [6-7] voltage reference
  *
  *  bit  7 6 5 4 3 2 1 0
- *       R R - - - C C C
+ *       R R - - C C C C
  */
 
 /*
  * adc_channel utility macros 
  */
-#define G_CH(x) (x & 07)                 /* get channel number */
-#define G_RE(x) (x>>6)                   /* get reference voltage */
-#define M_CH(x) (x & 07)                 /* masked channel number */
-#define M_RE(x) (x & 0300)               /* masked reference voltage */
-#define C_ADC(c,r) (c|r<<6)              /* adc_channel constructor */
+#define G_CH(x) (x & 017)                 /* get channel number */
+#define G_RE(x) (x>>6)                    /* get reference voltage */
+#define M_CH(x) (x & 017)                 /* masked channel number */
+#define M_RE(x) (x & 0300)                /* masked reference voltage */
+#define C_ADC(c,r) (c|r<<6)               /* adc_channel constructor */
 
 
 
@@ -54,7 +54,7 @@ void adc_start_conversion(adc_channel ch) {
     }
     if (M_CH(ch) != M_CH(last_conversion)) {
       /* must change physical channel */
-      ADMUX = (ADMUX &  0370) | M_CH(ch);
+      ADMUX = (ADMUX &  0360) | M_CH(ch);
       /* wait if needed */
     } 
     /* update last conversion */
@@ -116,7 +116,7 @@ void adc_setup(void) {
    * As a lateral effect it sets up the `last_conversion` private
    * module attribute.
    */
-  (void)adc_wait_get(C_ADC(1,Int11));
+  (void)adc_wait_get(C_ADC(ADC_CHANNEL_11V,Int11));
 }
 
 

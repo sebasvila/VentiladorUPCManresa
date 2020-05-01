@@ -14,6 +14,11 @@
 /* Max value returned by adc module conversion */
 #define ADC_MAX 0xff
 
+/* Special channels */
+#define ADC_CHANNEL_0V  017
+#define ADC_CHANNEL_11V 016
+
+
 /* Traslate adc value. Needs more work... */
 #define ADC_VALUE(v,M,m) \
   ((int32_t)m + ((int32_t)M-(int32_t)m)*(int32_t)v/(int32_t)ADC_MAX)
@@ -66,7 +71,8 @@ uint8_t adc_get(void);
  * 108 us.
  * Function blocks until read done.
  */
-//uint16_t adc_oversample(adc_channel ch); unimplemented yet
+//uint16_t adc_oversample(adc_channel ch);
+//unimplemented yet
 
 
 /* initialize the module */
