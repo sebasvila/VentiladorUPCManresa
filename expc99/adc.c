@@ -1,10 +1,11 @@
+#include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "adc.h"
 
 
 /* number of samples in oversampling (2's power) */
-#define N_SAMPLES 4
+#define N_SAMPLES UINT8_C(4)
 
 /* remembers last channel used */
 static adc_channel last_channel_used;
