@@ -28,8 +28,8 @@ SRC_MAIN = main
 # Link rules
 
 main: vaction.o timer.o motor.o
-test_adc: adc.o ticker.o shielditic.o
-test_adc_2: adc.o ticker.o shielditic.o
+test_adc: adc.o ticker.o shielditic.o alert.o pin.o
+test_adc_2: adc.o ticker.o shielditic.o alert.o pin.o
 test_ticker: ticker.o shielditic.o
 test_timer: pin.o timer.o
 test_timer2: pin.o timer.o

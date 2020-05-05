@@ -35,7 +35,7 @@ static void dot(void) {
 void alert_fatal(uint8_t e) {
   /* non return function */
   cli();
-  /* reconfig port */
+  /* reconfig port with no care to previous uses */
   fatal_alert_led = pin_bind(&FATAL_ALERT_PORT,
 			     FATAL_ALERT_PIN,
 			     Output);

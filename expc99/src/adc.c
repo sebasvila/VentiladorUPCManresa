@@ -1,14 +1,24 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "alert.h"
 #include "adc.h"
 
 
 /* number of samples in oversampling (2's power) */
 #define N_SAMPLES (UINT8_C(1<<2))
 
-/* remembers last channel used */
+/* remember last channel used */
 static adc_channel last_channel_used;
+
+/* number of adc channels using Vcc reference.
+ * used to manage incompatible references
+ */
+static struct {
+  int n_aref:4;
+  int n_other:4;
+} incompatible_refs = {0,0};
+
 
 /*
  * adc_channel internal representation:
@@ -32,6 +42,16 @@ static adc_channel last_channel_used;
 
 
 adc_channel adc_bind(uint8_t ch, adc_ref ref) {
+  /* manage references compatibility */
+  if (ref == Aref) {
+    if (incompatible_refs.n_other)
+      alert_fatal(ALRT_INCOMPATIBLE_ADC_REF);
+    incompatible_refs.n_aref++;
+  } else {
+    if (incompatible_refs.n_aref)
+      alert_fatal(ALRT_INCOMPATIBLE_ADC_REF);
+    incompatible_refs.n_other++;
+  }    
   /* disable digital port if needed */
   if (ch < 6)
     DIDR0 |= _BV(ch);
@@ -40,7 +60,13 @@ adc_channel adc_bind(uint8_t ch, adc_ref ref) {
 }
 
 
-void adc_unbind(adc_channel *const ch) {
+void adc_unbind(adc_channel *const ch) { 
+  /* manage references compatibility */
+  if (G_RE(*ch) == Aref) {
+    incompatible_refs.n_aref--;
+  } else {
+    incompatible_refs.n_other--;
+  }    
   /* enable digital port if needed */
   if (*ch < 6)
     DIDR0 &= ~_BV(*ch);
@@ -49,12 +75,15 @@ void adc_unbind(adc_channel *const ch) {
 
 
 void adc_prepare(adc_channel ch) {
+  bool discard_first_conversion = false;
+  
   /* test if same enviroment that last conversion */
   if (ch != last_channel_used) {
     if (M_RE(ch) != M_RE(last_channel_used)) {
       /* must change reference source */
       ADMUX = (ADMUX & 077) | M_RE(ch);
-      /* wait if needed */
+      /* discard first conversion as said in datasheet ¶23.4 */
+      discard_first_conversion = true;
     }
     if (M_CH(ch) != M_CH(last_channel_used)) {
       /* must change physical channel */
@@ -64,11 +93,21 @@ void adc_prepare(adc_channel ch) {
     /* update last conversion */
     last_channel_used = ch;
   }
+
+  /* if needed, do a transparent conversion and ignore result */
+  if (discard_first_conversion) {
+    /* avoid overreads */
+    while (ADCSRA & _BV(ADSC));
+    /* start single conversion: write ’1′ to ADSC */
+    ADCSRA |= _BV(ADSC);
+    /* here we expect the user to start the conversion and thus there
+     * we will wait for this conversion to end */
+  }
 }
 
 
 void adc_start_conversion(void) {
-  /* avoid overreads */
+  /* avoid overreads or wait initial null conversion */
   while (ADCSRA & _BV(ADSC));
 
   /* start single conversion: write ’1′ to ADSC */
