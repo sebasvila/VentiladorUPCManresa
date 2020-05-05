@@ -13,13 +13,14 @@ LDFLAGS=-std=c99
 #################################################################
 
 SRC_MODS = adc motor shielditic ticker vaction \
-           pin switch timer
+           pin switch timer alert
 
 SRC_TESTS = test_timer test_timer2 \
             test_pin \
             test_ticker \
 	    test_adc test_adc_2 \
-            test_switch_1 test_switch_2 test_switch_3
+            test_switch_1 test_switch_2 test_switch_3 \
+            test_alert_1
 
 SRC_MAIN = main 
 
@@ -37,6 +38,7 @@ test_switch_1: switch.o shielditic.o
 test_switch_2: switch.o shielditic.o
 test_switch_3: switch.o shielditic.o ticker.o
 test_switch_4: switch.o shielditic.o ticker.o adc.o
+test_alert_1: alert.o pin.o
 
 #################################################################
 

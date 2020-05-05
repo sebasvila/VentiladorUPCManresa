@@ -6,6 +6,7 @@
 #include "ticker.h"
 #include "shielditic.h"
 #include "adc.h"
+#include "config.h"
 
 static uint16_t offset;
 
@@ -58,7 +59,7 @@ PT_THREAD(pot(struct pt *pt))
 
   PT_BEGIN(pt);
 
-  ch = adc_bind(1, Vcc);
+  ch = adc_bind(POT_CHANNEL, POT_REFERENCE);
   adc_prepare(ch);
   
   for(;;) {

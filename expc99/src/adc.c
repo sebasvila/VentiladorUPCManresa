@@ -5,7 +5,7 @@
 
 
 /* number of samples in oversampling (2's power) */
-#define N_SAMPLES UINT8_C(4)
+#define N_SAMPLES (UINT8_C(1<<2))
 
 /* remembers last channel used */
 static adc_channel last_channel_used;
