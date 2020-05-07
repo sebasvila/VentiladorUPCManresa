@@ -8,11 +8,11 @@
  * half serial communication during compile time.
  * Default: both tx and rx
  */
-#if defined(SER_ONLY_TX) || !defined(SER_ONLY_RX))
+#if defined(SER_ONLY_TX) || !defined(SER_ONLY_RX)
 #define _SER_TX_
 #endif
 
-#if defined(SER_ONLY_RX) || !defined(SER_ONLY_TX))
+#if defined(SER_ONLY_RX) || !defined(SER_ONLY_TX)
 #define _SER_RX_
 #endif
 
@@ -32,6 +32,11 @@ uint8_t  serial_read(void);
 #ifdef _SER_TX_
 bool serial_can_write(void);
 void serial_write(uint8_t c);
+
+void serial_eol(void);
+void serial_write_s(char t[]);
+void serial_write_ui(unsigned int i);
+
 #endif
 
 #endif

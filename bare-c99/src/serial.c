@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -14,10 +15,10 @@
  * Input and output queues
  */
 #ifdef _SER_RX_
-static volatile queue_t inq;   // For received data
+static queue_t inq;   // For received data
 #endif
 #ifdef _SER_TX_
-static volatile queue_t outq;  // For data to be sent
+static queue_t outq;  // For data to be sent
 #endif
 
 /*
@@ -69,7 +70,7 @@ uint8_t serial_read(void) {
 
 
 #ifdef _SER_TX_
-bool serial_can_write(uint8_t c) {
+bool serial_can_write(void) {
   return !queue_is_full(&outq);
 }
 
@@ -83,14 +84,47 @@ void serial_write(uint8_t c) {
 #endif
 
 
+
+/***********************************************************
+ * Serial high level functions
+ ***********************************************************/
+
+
+#ifdef _SER_TX_
+void serial_eol(void) {
+  serial_write('\r');
+  serial_write('\n');
+}
+
+void serial_write_s(char t[]) {
+  for (int i=0;  t[i] != '\0'; i++) {
+    serial_write(t[i]);
+  }
+}
+
+void serial_write_ui(unsigned int i) {
+  char t[6];
+
+  utoa(i, t, 10);
+  (void)serial_write_s(t);
+}
+#endif
+
+
+
+
+
+
+
+
 void serial_open(void) {
-  #ifdef _SER_RX
+  #ifdef _SER_RX_
   // Enable reception
   UCSR0B |= _BV(RXEN0);
   // Enable rx interrupts
   UCSR0B |= _BV(RXCIE0);
   #endif
-  #ifdef _SER_TX
+  #ifdef _SER_TX_
   // Enable transmision
   UCSR0B |=  _BV(TXEN0);
   #endif
