@@ -1,28 +1,54 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "lcd.h"
+#include "charmaps.h"
 
+/*
 #define LBL_PEAK "PEAK:"
 #define LBL_PLATEAU "PLATEAU:"
 #define LBL_VOLUME "VOLUME |"
 #define LBL_RATE "I:R |"
 #define LBL_FREQUENCY "FREQ."
 #define LBL_DIVIDERS "       |     |"
+*/
 
+int main() {
+  lcd_t lcd = lcd_bind(&PORTD,4,5);
+  lcd_on(lcd);
+  lcd_disable_autoscroll(lcd);
+  lcd_clear(lcd);
+
+  lcd_create_char(lcd,0,U_char);
+  lcd_create_char(lcd,1,P_char);
+  lcd_create_char(lcd,2,C_char);
+  lcd_move_cursor(lcd,2,1);
+  lcd_send(lcd,LCD_DATA,0); //U
+  lcd_send(lcd,LCD_DATA,1); //P
+  lcd_send(lcd,LCD_DATA,2); //C
+  lcd_move_cursor(lcd,2,2);
+  lcd_print(lcd, "EPSEM RESPIRATOR");
+
+  for(;;);
+
+  return 0;
+}
+
+
+/*
 void setLabels(void){
   lcd_clear();
   lcd_return_home();
-  lcd_puts(LBL_PEAK);
+  lcd_print(LBL_PEAK);
   lcd_set_cursor(0,1);
-  lcd_puts(LBL_PLATEAU);
+  lcd_print(LBL_PLATEAU);
   lcd_set_cursor(0,2);
-  lcd_puts(LBL_VOLUME);
+  lcd_print(LBL_VOLUME);
   lcd_set_cursor(9,2);
-  lcd_puts(LBL_RATE);
+  lcd_print(LBL_RATE);
   lcd_set_cursor(15,2);
-  lcd_puts(LBL_FREQUENCY);
+  lcd_print(LBL_FREQUENCY);
   lcd_set_cursor(0,3);
-  lcd_puts(LBL_DIVIDERS);
+  lcd_print(LBL_DIVIDERS);
 }
 
 void setVolume(uint16_t volume) {
@@ -105,3 +131,4 @@ int main() {
   lcd_off();
   return 0;
 }
+*/

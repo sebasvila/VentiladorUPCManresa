@@ -20,9 +20,9 @@ SRC_TESTS = test_timer test_timer2 \
             test_ticker \
 	    test_adc test_adc_2 \
             test_switch_1 test_switch_2 test_switch_3 \
-            test_alert_1
+            test_alert_1 test_lcd
 
-SRC_MAIN = main 
+SRC_MAIN = main
 
 
 # Link rules
@@ -30,6 +30,7 @@ SRC_MAIN = main
 main: vaction.o timer.o motor.o
 test_adc: adc.o ticker.o shielditic.o alert.o pin.o
 test_adc_2: adc.o ticker.o shielditic.o alert.o pin.o
+test_lcd: lcd.o
 test_ticker: ticker.o shielditic.o
 test_timer: pin.o timer.o
 test_timer2: pin.o timer.o
@@ -48,13 +49,13 @@ test_alert_1: alert.o pin.o
 ifeq ($(PLATFORM),ArduinoONE)
   MCU = atmega328p
   PROGRAMMER = arduino
-  DUDEOPTS = 
-  FREQ = 16000000UL 
+  DUDEOPTS =
+  FREQ = 16000000UL
 else ifeq ($(PLATFORM),ArduinoMEGA)
   MCU = atmega2560
   PROGRAMMER = wiring
   DUDEOPTS = -D
-  FREQ = 16000000UL 
+  FREQ = 16000000UL
 endif
 
 
@@ -64,7 +65,7 @@ endif
 
 # Processing parameters
 
-CFLAGS   +=  -mmcu=$(MCU) 
+CFLAGS   +=  -mmcu=$(MCU)
 LDFLAGS  +=  -mmcu=$(MCU)
 CPPFLAGS +=  -D$(PLATFORM) -D$(SHIELD) -DF_CPU=$(FREQ) -I$(SRCDIR)
 
