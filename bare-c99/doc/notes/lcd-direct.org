@@ -1,0 +1,17 @@
+#+STARTUP: entitiespretty
+
+#+TITLE: Notes sobre accés a LCD amb connexió directa
+
+* Introducció
+
+D'acord amb el protocol del driver HD44780, que sembla estàndart en
+aquests displays.
+
+* Detalls a considerar
+
+** Temps d'espera d'una instrucció
+
+** Dualitat funció específica/send genèric
+
+** Incorporació de cua d'ordres i assincronia
+
