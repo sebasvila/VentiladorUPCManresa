@@ -6,8 +6,9 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-/* A 'lcd_t' is an abstraction of an LCD display using the HD44780 controller.
- * It is currently implemented to use a 4 bit data connection.
+/* A 'lcd_t' is an abstraction of an LCD display using the HD44780
+ * controller.  It is currently implemented to use a 4 bit data
+ * connection.
  */
 
 #define PORT(x) (*(x))
@@ -56,7 +57,7 @@
 
 typedef struct {
   volatile uint8_t *port;
-  uint8_t rs; // Tells the LCD if it is sending data (1) or an instruction (0)
+  uint8_t rs; // sending data =1; sending intruction = 0
   uint8_t rw; // Read / Write pin
   uint8_t en; // Enable pin
   uint8_t D0; // Data bits
