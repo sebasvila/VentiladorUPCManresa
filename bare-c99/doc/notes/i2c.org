@@ -21,7 +21,7 @@
    causa del comportament elèctric del circuït---; espera 4 us i
    transmet de nou.
 9) Cada 8 bits de dades en una direcció, hi 1 bit de ACK en l'altra. O
-   implica ACK i 1 NACK. Durant ACK el màstyer manté el control del
+   implica ACK i 1 NACK. Durant ACK el màster manté el control del
    rellotge i només canvia el sentit SDA.
 
 
