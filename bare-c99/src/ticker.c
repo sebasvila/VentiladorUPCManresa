@@ -29,10 +29,17 @@ void ticker_start(void) {
 }
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 
 uint16_t ticker_get(void) {
-  return ticks;
+  /* Guarantee that word not partially changed by ISR */
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    return ticks;
+  }
 }
+
+#pragma GCC diagnostic pop
 
 
 extern uint16_t ticker_tps(void);

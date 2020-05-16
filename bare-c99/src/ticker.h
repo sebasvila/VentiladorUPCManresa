@@ -17,7 +17,9 @@ void ticker_setup(void);
 /* Start ticker counting */
 void ticker_start(void);
 
-/* Get current ticker value */
+/* Get current ticker value.
+ * Only called if ticker started
+ */
 uint16_t ticker_get(void);
 
 /* Get ticker beat in ticks per second */
