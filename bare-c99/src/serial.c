@@ -98,7 +98,10 @@ void serial_eol(void) {
 
 void serial_write_s(char t[]) {
   for (int i=0;  t[i] != '\0'; i++) {
-    serial_write(t[i]);
+    if (t[i] == '\n')
+      serial_eol();
+    else
+      serial_write(t[i]);
   }
 }
 
@@ -106,7 +109,7 @@ void serial_write_ui(unsigned int i) {
   char t[6];
 
   utoa(i, t, 10);
-  (void)serial_write_s(t);
+  serial_write_s(t);
 }
 #endif
 
@@ -151,7 +154,7 @@ void serial_close(void) {
 }
 
 
-
+/* Set up the module. Assume that interrupts are disabled */
 void serial_setup(void) {
   // Initialize the queues
   #ifdef _SER_RX_
@@ -164,7 +167,7 @@ void serial_setup(void) {
   // Initialize the UART0 According to ¶19.5 we must wait last
   // transmision finishes and all data received: ignoring it.
   // According to ¶19.5 interrupts must be disabled and restored at
-  // end: assume setup is done with interrupts disabled always.
+  // end: assume setup is always called when interrupts disabled.
   UBRR0H = BAUDRATE_H(9600);
   UBRR0L = BAUDRATE_L(9600);
   // set normal baud rate 
@@ -176,3 +179,24 @@ void serial_setup(void) {
     ~_BV(USBS0)   ;                   // 1 stop bit
 }
 
+
+
+/*
+ * Note about concurrency in this module.
+ *
+ * When reasoning about concurrency and race conditions in this
+ * module take into account that:
+ * (1) The only concurrent thread that exists is that of ISR's
+ * (2) Queue operations are atomic
+ * Patterns as that of `serial_read()` that first waits to queue not
+ * being empty and then gets a byte from queue are usual:
+ *
+ *  while (queue_is_empty(&inq)); // better put to sleep
+ *  uint8_t r = queue_front(&inq);
+ *  queue_dequeue(&inq);
+ *   
+ * They are correct despite 
+ * an interrupt can be raised between teh while check and queue_front().
+ * An interrupt only can add new bytes to `inq` queue, and thus
+ * check remains valid in any case.
+ */
