@@ -18,7 +18,7 @@
 8) En transmissió bàsica d'un bit, el transmissor posa SCL a low i SDA
    al bit escaient; després d'un retard per que es propagui, posa de
    de nou SCL a 1 i espera que efectivament sigui 1 ---hi ha retards a
-   causa del comportament elèctric del circuït---; espera 4 us i
+   causa del comportament elèctric del circuït---; espera 4 µs i
    transmet de nou.
 9) Cada 8 bits de dades en una direcció, hi 1 bit de ACK en l'altra. O
    implica ACK i 1 NACK. Durant ACK el màster manté el control del
@@ -64,3 +64,24 @@
    d'STOP envia un START ---es coneix com mode combinat---.
 5) 
 
+
+
+* Idees per api
+
+Enten que es treballa a dos nivells. Un nivell per comunicacions i2c
+genèriques i, si cal, un nivell damunt amb protocols especifics dels
+dispositiuc concrets. Aquí ens referim al nivell i2c.
+
+
+Assumirem que la interacció amb un dispositiu sempre és equiparable a
+una crida a un subprograma. D'acord amb aquest model, podem considerar
+diversos tipus de crides:
+
+1) Tipus «acció», no retornen dades, només n'envien als nodes
+2) Tipus «funció», retornen dades.
+
+Cada interacció amb un node ---cada crida--- serà entesa com una feina
+que s'encomana al driver. Aquestes tasques s'encuarien i el driver les
+anira executant en un cert ordre.
+
+A banda del principi anterior, cal 
