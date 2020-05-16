@@ -20,17 +20,34 @@ static uint8_t inc(uint8_t v) {
 }
 
 void queue_empty(queue_t *const q) {
-  q->front = q->rear = 0;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    q->front = q->rear = 0;
+  }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
 bool queue_is_empty(const queue_t *const q) {
-  return q->front == q->rear;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    return q->front == q->rear;
+  }
 }
 
 bool queue_is_full(const queue_t *const q) {
-  return inc(q->rear) == q->front;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    return inc(q->rear) == q->front;
+  }
 }
 
+
+uint8_t queue_front(const queue_t *const q) {
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    return  q->t[q->front];
+  }
+}
+
+#pragma GCC diagnostic pop
 
 void queue_enqueue(queue_t *const q, uint8_t v) {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -48,9 +65,4 @@ void queue_dequeue(queue_t *const q) {
     }
   }
 }
-
-uint8_t queue_front(const queue_t *const q) {
-  return  q->t[q->front];
-}
-
 
