@@ -7,20 +7,23 @@ DEVICE=/dev/ttyACM0
 
 CC=avr-gcc
 CPPFLAGS=
-CFLAGS=-Wall -std=c99 -Os -fshort-enums
+CFLAGS=-Wall -std=gnu99 -Os -fshort-enums
 LDFLAGS=-std=c99
 
 #################################################################
 
 SRC_MODS = adc motor shielditic ticker vaction \
-           pin switch timer alert
+           pin switch timer alert queue serial
 
 SRC_TESTS = test_timer test_timer2 \
             test_pin \
             test_ticker \
 	    test_adc test_adc_2 \
             test_switch_1 test_switch_2 test_switch_3 \
-            test_alert_1 test_lcd
+            test_lcd \
+            test_alert_1 \
+	    test_serial_1 test_serial_2 test_serial_3 test_serial_4 \
+            test_serial_5
 
 SRC_MAIN = main
 
@@ -40,6 +43,12 @@ test_switch_2: switch.o shielditic.o
 test_switch_3: switch.o shielditic.o ticker.o
 test_switch_4: switch.o shielditic.o ticker.o adc.o
 test_alert_1: alert.o pin.o
+test_serial_1: serial.o queue.o
+test_serial_2: serial.o queue.o
+test_serial_3: serial.o queue.o adc.o ticker.o alert.o pin.o
+test_serial_4: serial.o queue.o adc.o ticker.o alert.o pin.o
+test_serial_5: serial.o queue.o adc.o ticker.o alert.o pin.o
+
 
 #################################################################
 

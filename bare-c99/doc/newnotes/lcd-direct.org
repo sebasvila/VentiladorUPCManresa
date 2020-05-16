@@ -1,0 +1,45 @@
+#+STARTUP: entitiespretty
+
+#+TITLE: Notes sobre accés a LCD amb connexió directa
+
+* Introducció
+
+D'acord amb el protocol del driver HD44780, que sembla estàndart en
+aquests displays.
+#+TITLE: Comentaris sobre el modul lcd nadiu
+
+* Detalls a reconsiderar
+
+** Temps d'espera d'una instrucció
+
+El datasheet indica que el temps d'execució de les instruccions és
+variable i que cal enviar la següent només quan l'anterior ha
+canviat. El controlador indica que està processant una instrucció a
+través d'un bit de dades. El protocol a seguir doncs és enviar
+instrucció, canviar direcció W per R, llegir bit d'ocupat fins que es
+pot enviar nova instrucció. Pwer llegir bit d'ocupat cal llegir un
+byte sencer encara que s'estigui en mode nibble.
+
+** Dualitat funció específica/send genèric
+
+El modul que tenim exporta funcions específiques (esborrar display,
+per exemple) i, a més, un send genèric amb tot de opcodes que
+corresponen a les operacions. 
+
+S'hauria d'avaluar si això té sentit atès que són redundants.
+
+** Incorporació de cua d'ordres i assincronia
+
+Atès els temps d'espera elevats entre instrucció i instrucció, es
+podria afegir una cua de bytes a enviar i un procés que anes
+buidant-la quan toca. Faria simple a l'usuari el treball i evitaria en
+gran manera els temps d'espera d'una manera transparent.
+
+Per contra introdueix assincronia entre l'escriptura i el moment en
+que s'escriu. S'hauria d'avaluar què comporta això, en especial quan
+el display ofereix feedback d'una acció de l'usuari.
+
+* Enllaços
+
+- [[https://www.sparkfun.com/datasheets/LCD/HD44780.pdf][Datasheet de HD477800]]
+- [[https://en.wikipedia.org/wiki/Hitachi_HD44780_LCD_controller][Entrada a wikipedia]]
