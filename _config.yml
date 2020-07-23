@@ -17,7 +17,7 @@ title: Ventilator UPC Manresa
 email: sebastia.vila@upc.edu
 description: >- # this means to ignore newlines until "baseurl:"
   A project developed at UPC Manresa to design a free and open ventilation unit.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/VentiladorUPCManresa" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  jekyll
