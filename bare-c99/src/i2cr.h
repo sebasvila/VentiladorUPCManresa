@@ -8,7 +8,7 @@
  */
 
 /* An i2c request type */
-typedef enum {I2Csend, I2Creceive, I2Csendrec} i2cr_type_t;
+typedef enum {I2Csend, I2Creceive} i2cr_type_t;
 
 /* An i2c node address */
 typedef uint8_t i2cr_addr_t;
@@ -25,10 +25,8 @@ typedef enum {
 typedef struct {
   i2cr_type_t rt;
   i2cr_addr_t node;
-  const uint8_t *const send_buffer;
-  uint8_t send_length;
-  uint8_t *const receive_buffer;
-  uint8_t receive_length;
+  uint8_t *const buffer;
+  uint8_t length;
   volatile i2cr_status_t *const status;
 } i2cr_request_t;
 

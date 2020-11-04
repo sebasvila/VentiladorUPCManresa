@@ -112,31 +112,58 @@ void i2c_receive_bb(i2cr_addr_t node,
  ********************************************************/
 
 
-typedef enum {
-	      Idle,
-	      WaitStartDone,
-	      WaitSlaveHit,
-	      End
+#define TW_GO_OPERATIVE 0xff
+
+/* Automata current state */
+typedef enum {Idle, Starting, SeekingSlaveTx, TxData,
+	      SeekingSlaveRx,
 } ida_state;
 
-
-typedef enum {
-	      GoOperative,
-	      StartSent,
-	      SlaveAddressSent,
-	      
-	      ErroneousCoditionReceived
-} ida_event;
+/* request being processed by driver */
+static i2cr_request_t current_req; // could it be a pointer?
 
 
-static void ida_next(ida_event e) {
-  static i2cr_request_t current_req; // could be a pointer?
 
+/* Hw utility functions */
+static void disable_i2c_interrupts(void) {}
+static void enable_i2c_interrupts(void) {}
+static void throw_start(void) {}
+static void throw_stop(void) {}
+static void throw_byte(uint8_t b) {}
+
+
+/*
+ * Set `s` status to current request and
+ *  - sends ReSTART and fetch new request from queue, or
+ *  - sends STOP and goes to Idle state
+ */
+static void fetch_or_iddle(i2cr_status_t s) {
+  *current_req.status = s;
+  if (i2cq_is_empty(&requests)) {
+    throw_stop();
+    disable_i2c_interrupts();
+    ida_state = Idle;
+  } else {
+    // fetch next request and begin cycle again
+    throw_start();
+    i2cq_front(&requests, &current_req);
+    i2cq_dequeue(&requests);
+    ida_state = Starting;
+  }
+}
   
-  switch (ida_state) {
+
+/*
+ * Do an automata transition after event `e`
+ * and current state `ida_current_state`
+ */
+static void ida_next(uint8_t e) {
+  static uint8_t i;   // next byte to be Rx/Tx
+  
+  switch (ida_current_state) {
   case Idle:
     /* In idle state. Interrupts disabled */
-    if (e == GoOperative) {
+    if (e == TW_GO_OPERATIVE) {
       // get next request, must exist for sure
       i2cq_front(&requests, &current_req);
       i2cq_dequeue(&requests);
@@ -144,30 +171,82 @@ static void ida_next(ida_event e) {
       enable_i2c_interrupts();
       throw_start();
       // next state
-      ida_state = WaitStartDone;
+      ida_state = Starting;
     } else {
-      // remain Iddle
+      // unexpected event
     }
     break;
 
-  case WaitStartDone:
+  case Starting;
     /* START sent, waiting it to finish */
-    if (e = StartSent) {
+    if (e == TW_START) {
       // The bus is available, begin messaging a node
-      throw_byte(current_req.node |
-		 (current_req.rt != I2Creceive)?(0):(1)
-		 );
-      // next state
-      ida_state = WaitSlaveHit;
+      i = 0;
+      if (current_req.rt == I2Creceive) {
+	throw_byte(current_req.node | TW_READ);
+	ida_state = SeekingSlaveRx;
+      } else {
+	// I2Csend
+	throw_byte(current_req.node | TW_WRITE);
+	ida_state = SeekingSlaveTx;
+      }
     } else {
-      // if other event arrives, its an error
+      // unexpected event
       error();
     }
     break;
 
-  case WaitSlaveHit:
+  case SeekingSlaveTx:
+    if (e == TW_MT_SLA_ACK) {
+      // Slave contacted, let's talk with him
+      throw_byte(current_req.buffer[i++]);
+      ida_state = TxData;
+    } else if (e == TW_MT_SLA_NACK) {
+      // Slave contacted and not available
+      fetch_or_idle(SlaveRejected);
+    } else {
+      // Unexpected event
+    }
+    break;
+
+  case TxData:
+    if (e == TX_MT_DATA_ACK) {
+      // Data sent ok
+      if (current_req.length != i) {
+	// Send anothe byte and remain in the same state
+	throw_byte(current_req.buffer[i++]);
+      } else {
+	// No more data to send
+	fetch_or_idle(Success);
+      }
+    } else if (e == TX_MT_DATA_NACK) {
+      // Data rejected by slave
+      fetch_or_idle(SlaveDiscardedData);
+    } else {
+      // Unexpected event
+    }
+    break;
+    
+  case SeekingSlaveRx:
+    if (e == TW_MR_SLA_ACK) {
+      // Slave contacted, let's talk with him
+      // Request a new byte. Maybe the last one
+      throw_request_byte(current_req.lengtrh == 1);
+      ida_state = RxData;
+    } else if (e == TW_MR_SLA_NACK) {
+      // Slave contacted and not available
+      fetch_or_idle(SlaveRejected);
+    } else {
+      // Unexpected event
+    }
     break;
   }
+
+  case RxData:
+    if (e == TW_MR_DATA_ACK) {
+    } else if (e == TW_MR_DATA_NACK) {
+    }
+    break;
 }
 
 
