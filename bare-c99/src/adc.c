@@ -1,3 +1,10 @@
+/**
+ * @addtogroup adc
+ * @file adc.c
+ *
+ * @brief The implementation of module adc
+ */
+
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
