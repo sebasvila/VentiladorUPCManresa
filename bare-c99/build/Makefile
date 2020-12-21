@@ -13,7 +13,8 @@ LDFLAGS=-std=c99
 #################################################################
 
 SRC_MODS = adc motor shielditic ticker vaction \
-           pin switch timer alert queue serial
+           pin switch timer alert queue serial \
+	   i2cq i2c
 
 SRC_TESTS = test_timer test_timer2 \
             test_pin \
