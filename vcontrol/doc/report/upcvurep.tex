@@ -8,9 +8,13 @@
 \newcommand{\vSI}[2]{\SI[math-rm=\ensuremath,parse-numbers=false]{#1}{#2}}
 
 
-\title{UPC Ventilator Unit Stepper Motor Control}
-\author{Sebas Vila\\Manresa School of Engineering\\Universitat
-  Politècnica de Catalunya}
+\title{
+  UPC Manresa Ventilator Unit\\
+  Control Software}
+\author{
+  Sebas Vila\\
+  Manresa School of Engineering\\
+  Universitat Politècnica de Catalunya}
 
 \addbibresource{local.bib}
 
@@ -48,15 +52,37 @@ to move the motor following a suitable profile.
 % why???
 We focused on the inspiration motion.
 
+% explain some ideas about the mechanical part to better introduce the report
+
 After this introduction, the manuscript is organized as follows.
 
-\section{UPC ventilator cycle model}
 
-The UPC mechanical ventilation unit follows a periodic profile like
-this one shown in Figure~\ref{fig:ventilation-profile}. There is a set
-of parameters that are used to control the main characteristics of
-this profile. Some of them can be interactively tunned by the end user
-while other remain constant. These parameters are shown below.
+
+
+\section{Ventilator cycle model}
+\label{sec:vent-cycle-model}
+
+In this section we explain the VU motion profile. This profile defines
+the dynamic rotation of the motor with respect to the time. We assume
+that the motor rotation profile is correlated to the flux and volume of
+insufflated air.
+
+The VU follows a periodic profile. The
+figure~\ref{fig:ventilation-profile} shows a single period of the
+profile. The main characteristics of the profile are defined by a set
+of parameters. The end user modifies the parameters to dynamically
+change the profile. While most of the parameters can be interactively
+tunned by the end user, a small part remain constant and they are
+considered system constants.
+
+Time notation is sometimes confusing. In what follows we will
+distinguish between time durations and time instants. Time instants
+will always be referred to $t_0$, the beginning of a breathe
+cycle. This manuscript will use plain names to denote time durations
+as $\mathit{ir}$ and $t_{\mathit{ir}}$ to denote time instants, see
+figure~\ref{fig:ventilation-profile}.
+
+The set of parameters is the following.
 
 \begin{figure}[tb]
   \centering
@@ -70,7 +96,7 @@ while other remain constant. These parameters are shown below.
     \foreach \y in {0,...,8}
     \draw (1pt,\y) -- (-3pt,\y);
     % axis labels      
-    \node[below=2cm] at (x axis mid)
+    \node[below=2.7cm] at (x axis mid)
     {\small Time [s]};
     \node[rotate=90, above=1.6cm] at (y axis mid)
     {\small Angle rotated [rad]};
@@ -109,15 +135,18 @@ while other remain constant. These parameters are shown below.
     \draw [thin,loosely dotted] plot (end-insp-lin) -- (end-insp-lin-|0,0);
     \draw [thin,loosely dotted] plot (end-insp-dec) -- (end-insp-dec-|0,0);
     % x axis annotations
-    \draw (0,-3pt) node[anchor=north] {$0$};
-    \draw (end-exp-pau |- 0,-3pt) node[anchor=north] {$T$};
+    \draw (0,-3pt) node[anchor=north] {$t_0$};
+    \draw (end-insp-dec |- 0,-3pt) node[anchor=north] {$t_\mathit{ir}$};
+    \draw (end-exp-pau |- 0,-3pt) node[anchor=north] {$t_T$};
     % y axis annotations
-    \draw (-3pt,0) node[anchor=east] {$0$};
+    \draw (-3pt,0) node[anchor=east] {$\theta_0$};
     \draw (end-insp-acc-|-3pt,0) node[anchor=east] {$\theta_{r}$};
-    \draw (end-insp-lin-|-3pt,0) node[anchor=east] {$\theta_{T}-\theta_r$};
-    \draw (end-insp-dec-|-3pt,0) node[anchor=east] {$\theta_{T}$};
+    \draw (end-insp-lin-|-3pt,0) node[anchor=east] {$\theta_{ir}-\theta_r$};
+    \draw (end-insp-dec-|-3pt,0) node[anchor=east] {$\theta_{ir}$};
     \draw (-3pt,8) node[anchor=east] {$\theta_{max}$};
     % draw important time intervals
+    \draw [thin]
+    (beg-insp|-0,-4.4) edge[<->] node[above] {$T$} (end-exp-pau|- 0,-4.4);
     \draw [thin]
     (beg-insp|-0,-3.2) edge[<->] node[above] {$I$} (end-insp-pau|- 0,-3.2);
     \draw [thin]
@@ -131,11 +160,11 @@ while other remain constant. These parameters are shown below.
     \draw [thin]
     (end-exp|-0,-2) edge[<->] node[above] {$ep$} (end-exp-pau |- 0,-2);
     % draw time intervals reference lines
-    \draw [thin,loosely dotted] plot (beg-insp)     -- (beg-insp    |-0,-3.7);
+    \draw [thin,loosely dotted] plot (beg-insp)     -- (beg-insp    |-0,-4.6);
     \draw [thin,loosely dotted] plot (end-insp-dec) -- (end-insp-dec|-0,-2.5);
     \draw [thin,loosely dotted] plot (end-insp-pau) -- (end-insp-pau|-0,-3.7);
     \draw [thin,loosely dotted] plot (end-exp)      -- (end-exp     |-0,-2.5);
-    \draw [thin,loosely dotted] plot (end-exp-pau)  -- (end-exp-pau |-0,-3.7);
+    \draw [thin,loosely dotted] plot (end-exp-pau)  -- (end-exp-pau |-0,-4.6);
   \end{tikzpicture}
   \label{fig:ventilation-profile}
   \caption{Ventilation cycle profile.}
@@ -143,11 +172,13 @@ while other remain constant. These parameters are shown below.
 
 \begin{description}
   
-\item[breathing rate] The breathing rate $\mathit{rr}$ defines the
+\item[breathing rate] The breathing rate, $\mathit{rr}$, defines the
   breathing frequency. Usually measured in breathing cycles per
   minute. The period $T$ in [\si{\second}] can be obtained as:
   $$
-  T = \bigg(\frac{60}{\mathit{rr}}\bigg)^{-1} = \frac{\mathit{rr}}{60}
+  \boxed{
+    T = \bigg(\frac{60}{\mathit{rr}}\bigg)^{-1} = \frac{\mathit{rr}}{60}
+  }
   $$
   This parameter can be tunned by the end user.
 
@@ -175,9 +206,11 @@ while other remain constant. These parameters are shown below.
   turning an angle $\theta<\theta_\textit{max}$ we obtain a smaller
   air volume. The ``travel'', noted as $\mathit{tr}$, is the actual
   percentage of angle turned with respect to the maximum. Then, the
-  actual angle turned $\theta_T$ is
+  actual angle turned $\theta_{ir}$ is
   $$
-  \theta_T = \frac{\mathit{tr}\cdot\theta_\mathit{max}}{100}
+  \boxed{
+    \theta_{ir} = \frac{\mathit{tr}\cdot\theta_\mathit{max}}{100}
+  }
   $$
   This parameter can be tunned by the end user.
   
@@ -187,11 +220,12 @@ while other remain constant. These parameters are shown below.
 
 \end{description}
 
+
 The parameters explained before fully define the time characteristics
 of the ventilation cycle. However, as shown in the
 figure~\ref{fig:ventilation-profile}, there are additional variables
 which are interesting. In what follows we obtain the values of $E$,
-$I$, $\mathit{ip}$ and $\mathtt{ep}$ from the system parameters.
+$I$, $\mathit{ip}$ and $\mathit{ep}$ from the system parameters.
 
 Assume that $T$ and $k$, the I:E ratio, are known parameters. Then,
 times $E$ and $I$ can be computed following this equation
@@ -206,7 +240,9 @@ times $E$ and $I$ can be computed following this equation
 which leads to
 \begin{equation}
   \label{eq:19}
-  I = \frac{T}{k+1} \qquad E = \frac{kT}{k+1}
+  \boxed{
+    I = \frac{T}{k+1} \qquad E = \frac{kT}{k+1}
+  }
 \end{equation}
 
 In the figure~\ref{fig:ventilation-profile}, $\mathit{ip}$ and
@@ -225,24 +261,26 @@ $\mathit{ep}$ can be obtained by the equation
 by replacing the second equation on the first we obtain
 \begin{equation*}
   \begin{split}
-    T &= \mathit{ir}+\mathtt{ip}+k(\mathit{ir}+\mathit{ip}) \\
+    T &= \mathit{ir}+\mathit{ip}+k(\mathit{ir}+\mathit{ip}) \\
       &= (k+1)\mathit{ir} + (k+1)\mathit{ip}
   \end{split}
 \end{equation*}
 which results in
 \begin{equation}
   \label{eq:20}
-  \mathit{ip} = \frac{T-(k+1)\mathtt{ir}}{k+1}
+  \boxed{
+    \mathit{ip} = \frac{T-(k+1)\mathit{ir}}{k+1}
+  }
 \end{equation}
 applying the last result to the first equation conduces to
 \begin{equation*}
-  T = \mathit{ir}+\frac{T-(k+1)\mathtt{ir}}{k+1}+\mathit{er}+\mathtt{ep}\\
+  T = \mathit{ir}+\frac{T-(k+1)\mathit{ir}}{k+1}+\mathit{er}+\mathit{ep}\\
 \end{equation*}
 from where
 \begin{equation*}
   \begin{split}
     \mathit{ep} &=
-    T-\mathit{ir}-\mathit{er}-\frac{T-(k+1)\mathtt{ir}}{k+1}\\
+    T-\mathit{ir}-\mathit{er}-\frac{T-(k+1)\mathit{ir}}{k+1}\\
     &=
     \frac{(k+1)T-(k+1)\mathit{ir}-(k+1)\mathit{er}-T+(k+1)\mathit{ir}}
     {k+1}\\
@@ -252,20 +290,229 @@ from where
 then
 \begin{equation}
   \label{eq:25}
-  \mathit{ep} = \frac{kT-(k+1)\mathit{er}}{k+1}
+  \boxed{
+    \mathit{ep} = \frac{kT-(k+1)\mathit{er}}{k+1}
+  }
 \end{equation}
-
-
-
 
 
 \subsection{Inspiration ramp shape}
 
-The inspiration ramp has an S shape that smoothes the movement. As
-shown in figure~\ref{fig:ventilation-profile}, the ramp has three main
-sections. An acceleration section, a constant speed section, and a
-decceleration section. The model considers the acceleration and the
-decceleration sections to be symmetrical.
+\begin{figure}[tb]
+  \centering
+  \begin{tikzpicture}[y=0.6cm, x=1.2cm]
+    % axis
+    \draw (0,0) -- coordinate (x axis mid) (4,0);
+    \draw (0,0) -- coordinate (y axis mid) (0,8);
+    % ticks
+    \foreach \x in {0,...,4}
+    \draw (\x,1pt) -- (\x,-3pt);
+    \foreach \y in {0,...,8}
+    \draw (1pt,\y) -- (-3pt,\y);
+    % axis labels      
+    \node[below=2cm] at (x axis mid)
+    {\small Time [s]};
+    \node[rotate=90, above=1.6cm] at (y axis mid)
+    {\small Angle rotated [rad]};
+    % main coordinates
+    \coordinate (beg-insp)     at (0,0) ;
+    \coordinate (end-insp-acc) at (1,1) ;
+    \coordinate (end-insp-lin) at (2,5) ;
+    \coordinate (end-insp-dec) at (3,6) ;
+    % draw angle function
+    \draw [ultra thick] plot
+    (beg-insp) .. controls +(0:0.6) and +(254:0.6) ..
+    (end-insp-acc) --
+    (end-insp-lin) .. controls +(76:0.6) and +(180:0.6) ..
+    (end-insp-dec);
+    % draw special dots on curve
+    \fill (beg-insp)     circle(1.4pt);
+    \fill (end-insp-acc) circle(1.4pt);
+    \fill (end-insp-lin) circle(1.4pt);
+    \fill (end-insp-dec) circle(1.4pt);
+    % draw vertical reference lines
+    \draw [thin,loosely dotted] plot (end-insp-acc) -- (end-insp-acc|-0,0);
+    \draw [thin,loosely dotted] plot (end-insp-lin) -- (end-insp-lin|-0,0);
+    \draw [thin,loosely dotted] plot (end-insp-dec) -- (end-insp-dec|-0,0);
+    % draw horizontal reference lines
+    \draw [thin,loosely dotted] plot (end-insp-acc) -- (end-insp-acc-|0,0);
+    \draw [thin,loosely dotted] plot (end-insp-lin) -- (end-insp-lin-|0,0);
+    \draw [thin,loosely dotted] plot (end-insp-dec) -- (end-insp-dec-|0,0);
+    % x axis annotations
+    \draw (0,-3pt) node[anchor=north] {$t_0$};
+    \draw (end-insp-acc |- 0,-3pt) node[anchor=north] {$t_r$};
+    \draw (end-insp-dec |- 0,-3pt) node[anchor=north] {$t_\mathit{ir}$};
+    % y axis annotations
+    \draw (-3pt,0) node[anchor=east] {$\theta_0$};
+    \draw (end-insp-acc-|-3pt,0) node[anchor=east] {$\theta_{r}$};
+    \draw (end-insp-lin-|-3pt,0) node[anchor=east] {$\theta_{ir}-\theta_r$};
+    \draw (end-insp-dec-|-3pt,0) node[anchor=east] {$\theta_{ir}$};
+    \draw (-3pt,8) node[anchor=east] {$\theta_{max}$};
+    % draw important time intervals
+    \draw [thin]
+    (beg-insp|-0,-2) edge[<->] node[above] {$ir$} (end-insp-dec |- 0,-2);
+    % draw time intervals reference lines
+    \draw [thin,loosely dotted] plot (beg-insp)     -- (beg-insp    |-0,-3.7);
+    \draw [thin,loosely dotted] plot (end-insp-dec) -- (end-insp-dec|-0,-2.5);
+  \end{tikzpicture}
+  \label{fig:S-shape-profile}
+  \caption{Ventilation ramp S-shape profile.}
+\end{figure}
+
+The inspiration ramp has an S-shape profile that smoothes the motor
+motion. The figure~\ref{fig:S-shape-profile} focuses on this ramp. The
+ramp exhibits three main sections: (i) a constant acceleration
+section; (ii) a constant speed section; and (iii) a constant
+deceleration section. The acceleration and the deceleration sections
+are symmetrical.
+
+The speedup section ratio, $\mathit{ssr}\in(0,0.5]$, is the system
+parameter which defines the inspiration ramp shape. It cannot be
+tunned by the end user.
+%
+Specifically, $\mathit{ssr}$ defines the size of the acceleration and
+deceleration sections.
+
+Let $\theta_{ir}$ be the angular travel of the actual profile. Then,
+given $\mathit{ssr}$, the S-shape profile is defined as follows. The
+acceleration section spans from $\theta_0$ to
+$\theta_r=\mathit{ssr}\cdot\theta_{ir}$; the constant speed section
+goes from $\theta_r$ to $\theta_{ir}-\theta_r$; and the deceleration
+section spans from $\theta_{ir}-\theta_r$ to $\theta_{ir}$. Note that
+the sections are defined over the turned angle.
+
+The figure~\ref{fig:profile}, shows a complementary view of the
+inspiration ramp S-shaped profile. This view shows the angular speed
+in function of the turned angle. Note that in central section
+rotational speed $\omega_r$ is constant while in the first and the
+last sections there is a constant acceleration $\omega'_r$ and
+deceleration $-\omega'_r$, respectively.
+
+Given this profile of speeds we are faced to a new problem. We need to
+determine which are the values of $\omega_r$ and $\omega_r'$ that
+should be applied to inspiration ramp. The next subsection is devoted
+to solve this issue.
+
+\begin{figure}[tb]
+  \centering
+  \begin{tikzpicture}[y=.2cm, x=1cm,scale=0.8]
+    % axis
+    \draw (0,0) -- coordinate (x axis mid) (10,0);
+    \draw (0,0) -- coordinate (y axis mid) (0,20);
+    % ticks
+    \foreach \x in {0,...,10}
+    \draw (\x,1pt) -- (\x,-3pt);
+    \foreach \y in {0,5,...,20}
+    \draw (1pt,\y) -- (-3pt,\y);
+
+    % 
+    \draw (0,-3pt) node[anchor=north] {$0$};
+    \draw (2,-3pt) node[anchor=north] {$\theta_r$};
+    \draw (7,-3pt) node[anchor=north] {$\theta_{ir}-\theta_r$};
+    \draw (9,-3pt) node[anchor=north] {$\theta_{ir}$};
+
+    \draw (-3pt,0) node[anchor=east] {$0$};
+    \draw (-3pt,15) node[anchor=east] {$\omega_r$};
+    
+    % axis labels      
+    \node[below=0.6cm] at (x axis mid)
+    {\small Turned angle [\si{\radian}]};
+    \node[rotate=90, above=0.6cm] at (y axis mid)
+    {\small Angular speed [\si{\radian\per\second}]};
+
+    % annotated line
+    \draw [ultra thick] plot
+    (0,0)  -- node[midway,above,sloped]{$\omega_r'$}
+    (2,15) --
+    (7,15) -- node[midway,above,sloped]{$-\omega_r'$}
+    (9,0);
+    \draw [thin,loosely dotted] plot (2,0) -- (2,15);
+    \draw [thin,loosely dotted] plot (7,0) -- (7,15);
+  \end{tikzpicture}
+  \label{fig:profile}
+  \caption{Inspiration ramp angular speed in function of turned angle.}
+\end{figure}
+
+
+\subsection{Inspiration ramp speed and acceleration values}
+\label{sec:comp-prof-param}
+
+The inspiration ramp S-shaped profile is fully defined by three
+parameters: the inspiration ramp time $\mathit{ir}$, the total angle
+turned $\theta_{ir}$, and the speedup section ratio $\mathit{ssr}$.
+%%% NOTA: en aquest apartat T ha de canviar-se per \mathit{ir}
+
+According the previous section, $\mathit{ssr}$ determines the angle
+turned during speedup section $\theta_r$. In what follows we will
+consider $\theta_r$ instead of $\mathit{ssr}$.
+
+The goal of this section is to work out the values of $\omega_r$ and
+$\omega'_r$ given the parameters $\mathit{ir}$, $\theta_{ir}$, and
+$\theta_r$.
+
+In what follows, assume that $\theta$, $\omega$ and $\omega'$ will
+denote a turned angle, an angular speed and an angular acceleration,
+respectively.
+
+
+% Assume that $\theta_{ir}$ is the total angle turned by the motor
+% following the inspiration ramp S-profile, $\theta_r$ is the angle
+% turned by the motor at the end of the speedup ramp, and $ir$ the total
+% time spent during the profile motion, see
+% figure~\ref{fig:ventilation-profile}.
+
+% begin workout
+
+Assume that $t_r$ is the time spent to turn the acceleration section
+angle $\theta_r$. Then, the total angle turned at the end of the
+acceleration section is given by kinematic basic equation
+$\theta_r=\frac{\omega_r' t_r^2}{2}$. Thus,
+\begin{equation}
+  \label{eq:22}
+  t_r = \sqrt{\frac{2\theta_r}{\omega_r'}}
+\end{equation}
+
+The angular speed reached at the end of the acceleration section can
+be obtained by applying the basic equation $\omega=\omega' t$ and
+Eq.~(\ref{eq:22}),
+\begin{equation}
+  \label{eq:23}
+  \boxed{
+    \omega_r=\omega_r' t_t= \omega_r' \sqrt{\frac{2\theta_r}{\omega_r'}} = \sqrt{2\theta_r\omega_r'}
+  }
+\end{equation}
+note that $\omega_r$ is the constant angular velocity of the middle
+section of the movement.
+
+By applying the fundamental constant speed equation
+$t=\frac{\theta}{\omega}$ and the result of Eq.~(\ref{eq:23}), the time
+spent in the middle section, say $t_m$, can be obtained as follows
+\begin{equation}
+  \label{eq:24}
+  t_m = \frac{\theta_{ir}-2\theta_r}{\sqrt{2\theta_r\omega_r'}}
+\end{equation}
+
+Given the results (\ref{eq:22}) and (\ref{eq:24}) the following
+equation on the inspiration ramp total time $\mathit{ir}$ holds:
+\begin{eqnarray}
+  \label{eq:1}
+  ir &=& 2t_r + t_m \\
+    &=& 2\sqrt{\frac{2\theta_r}{\omega_r'}} +
+        \frac{\theta_{ir}-2\theta_r}{\sqrt{2\theta_r\omega_r'}}
+\end{eqnarray}
+
+Because $\mathit{ir}$, $\theta_{ir}$ and $\theta_r$ are known, the value of
+$\omega_r'$ can be worked out from the previous equation. By using the
+symbolic calculator \texttt{SymPy}, \cite{team20:_sympy}, we got the
+following result,
+\begin{equation}
+  \label{eq:3}
+  \boxed{
+    \omega_r' = \frac{\theta_{ir}^2 + 4\theta_{ir}\theta_r + 4\theta_r^2}{2\theta_{ir} \mathit{ir}^2}
+  }
+\end{equation}
+
+
 
 
 
@@ -290,44 +537,6 @@ Thus, the angular motion $\theta_m$ of the middle section accounts for
 \theta_m=\theta_T-2\theta_r
 \end{equation}
 
-\begin{figure}[tb]
-  \centering
-  \begin{tikzpicture}[y=.2cm, x=1cm]
-    % axis
-    \draw (0,0) -- coordinate (x axis mid) (10,0);
-    \draw (0,0) -- coordinate (y axis mid) (0,20);
-    % ticks
-    \foreach \x in {0,...,10}
-    \draw (\x,1pt) -- (\x,-3pt);
-    \foreach \y in {0,5,...,20}
-    \draw (1pt,\y) -- (-3pt,\y);
-
-    % 
-    \draw (0,-3pt) node[anchor=north] {$0$};
-    \draw (2,-3pt) node[anchor=north] {$\theta_r$};
-    \draw (7,-3pt) node[anchor=north] {$\theta_T-\theta_r$};
-    \draw (9,-3pt) node[anchor=north] {$\theta_T$};
-
-    \draw (-3pt,0) node[anchor=east] {$0$};
-    \draw (-3pt,15) node[anchor=east] {$\omega_r$};
-    
-    % axis labels      
-    \node[below=0.6cm] at (x axis mid) {\small Angle turned (rad)};
-    \node[rotate=90, above=0.6cm] at (y axis mid)
-    {\small Angular speed ($\mbox{rad}/s$)};
-
-    % annotated line
-    \draw [very thick] plot
-    (0,0)  -- node[midway,above,sloped]{$\omega_r'$}
-    (2,15) --
-    (7,15) -- node[midway,above,sloped]{$-\omega_r'$}
-    (9,0);
-    \draw [thin,loosely dotted] plot (2,0) -- (2,15);
-    \draw [thin,loosely dotted] plot (7,0) -- (7,15);
-  \end{tikzpicture}
-  \label{fig:profile}
-  \caption{Angular speed profile.}
-\end{figure}
 
 The problem is now how to appropiately drive the stepper motor to get
 this kind of profile. Moreover, some parameters of the profile should
@@ -617,73 +826,6 @@ and continue computing the sequence of $c_i$'s.
 \end{itemize}
 
 
-\section{Computing profile parameters}
-\label{sec:comp-prof-param}
-
-
-Section~\ref{sec:const-accel-moti} gives a method to compute the motor
-steps timing needed to drive it through the profile defined in
-Section~\ref{sec:basic-prof-char}. However, as said before, we want the
-resulting profile to be parametrized by three values: the total time
-spent $T$, the total angle turned $\theta_T$, and the angle turned
-during speedup section $\theta_r$.
-
-To generate the motor steps timing
-the ramp angular acceleration $\omega_r'$ is needed. The goal of this
-section is to work out the value of $\omega_r'$ given the parameters
-$T$, $\theta_T$, and $\theta_r$.
-
-In what follows, assume that $\theta$, $\omega$ and $\omega'$ are a
-turned angle, an angular speed and an angular acceleration
-respectively.
-%
-Also assume that, $\theta_T$ is the total angle turned by the motor
-following the profile described in Sec.~\ref{sec:basic-prof-char},
-$\theta_r$ is the angle turned by the motor at the end of the speedup
-ramp, and $T$ the total time spent during the profile motion.
-
-
-The total angle turned at the end of the speedup ramp is given by
-kinematic basic equation $\theta_r=\frac{\omega_r' t_r^2}{2}$, thus the time
-spent to turn the rampup angle is:
-\begin{equation}
-  \label{eq:22}
-  t_r = \sqrt{\frac{2\theta_r}{\omega_r'}}
-\end{equation}
-
-Angular speed reached at the end of the speedup ramp can be obtained
-by applying the basic equation $\omega=\omega' t$ and
-Eq.~(\ref{eq:22}),
-\begin{equation}
-  \label{eq:23}
-  \omega_r=\omega_r' t_t= \omega_r' \sqrt{\frac{2\theta_r}{\omega_r'}} = \sqrt{2\theta_r\omega_r'}
-\end{equation}
-Note that this is also the constant angular velocity of the middle
-section of the movement, thus $\omega_m = \omega_r$.
-
-Applying the fundamental constant speed equation
-$t=\frac{\theta}{\omega}$ and the result of Eq.~(\ref{eq:23}) the time
-spent in the middle section, $t_m$, can be obtained as follows
-\begin{equation}
-  \label{eq:24}
-  t_m = \frac{\theta_T-2\theta_r}{\sqrt{2\theta_r\omega_r'}}
-\end{equation}
-
-Given results (\ref{eq:22}) and (\ref{eq:24}) the following equation on
-total profile time $T$ holds:
-\begin{eqnarray}
-  \label{eq:1}
-  T &=& 2t_r + t_m \\
-    &=& 2\sqrt{\frac{2\theta_r}{\omega_r'}} +
-        \frac{\theta_T-2\theta_r}{\sqrt{2\theta_r\omega_r'}}
-\end{eqnarray}
-assume that $T$, $\theta_T$ and $\theta_r$ are known, then $\omega_r'$
-can be worked out. By using the symbolic calculator \texttt{SymPy},
-\cite{team20:_sympy}, we got the following,
-\begin{equation}
-  \label{eq:3}
-  \omega_r' = \frac{\theta_T^2 + 4\theta_T\theta_r + 4\theta_r^2}{2\theta_T T^2}
-\end{equation}
 
 \printbibliography
 
