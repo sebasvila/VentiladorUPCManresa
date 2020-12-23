@@ -15,13 +15,15 @@ project includes:
 
 ## Project structure
 
-* libvent: The base software library of the project. It's written in C
+* libaire: The base software library of the project. It's written in C
   and assumes no underlaying software other than AVR libc and
-  protothreads.
+  protothreads. Interruptions should only be used inside this level.
+
+* libdev: The devices and other peripherals library which are based on libaire.
 
 * vcontrol: The control software of the ventilator unit. Builds on top
-  of libvent and the specific hardware of the ventilator. It is in
-  charge of the user interface of the system and the control of the
+  of libaire and libdev, which are the specific hardware of the ventilator.
+  It is in charge of the user interface of the system and the control of the
   motor.
 
 * golfes: A directory that contains old materials of historical value
