@@ -231,6 +231,7 @@ void create_custom_chars(void) {
  */
 void display_init(void) {
   /* l = lcd_constructor(LCD_I2C_ADDRESS,4); */
+  _delay_ms(50);
   lcd_init(&l);
 
   create_custom_chars();
