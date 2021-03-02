@@ -112,6 +112,22 @@ void vaction_set_tr(uint8_t tr) {
 }
 
 
+/*******************
+ * Status control
+ * ****************/
+
+typedef enum {stopped, working, stopping} status_t;
+status_t status = stopped;
+
+void start_breathe(){
+  update_params();
+  status = working;
+}
+
+void stop_breathe(){
+  if (status == working) status = stopping;
+}
+
 
 /*****************************************************************
  * Ventilation action timer callbacks
@@ -135,6 +151,8 @@ PT_THREAD(vaction_thread(struct pt *pt))
    * breathe forever!!
    */
   for(;;) {
+    PT_WAIT_WHILE(pt, status != working);
+    
     /* inspiration rising. assume motor wind direction */
     c = (param.ir/10.0) / (param.travel-1) * freq;
     timer_set_action(motor_step);
@@ -170,6 +188,7 @@ PT_THREAD(vaction_thread(struct pt *pt))
     motor_reverse(); // set wind dir again
     motor_disable(); // action in rest position: break torque not needed
     PT_WAIT_WHILE(pt, timer_armed());
+    if (status == stopping) status = stopped;
   }
   
   PT_END(pt);

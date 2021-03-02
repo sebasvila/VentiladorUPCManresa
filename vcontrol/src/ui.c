@@ -355,13 +355,13 @@ PT_THREAD(buttons_thread(struct pt *pt))
           main_form[PLATEAU].val_format = UINT_FORMAT;
           main_form[PEAK].val_format = UINT_FORMAT;
           machine_status = WORKING;
-          /* start_breathe(); */
+          start_breathe();
         } else if (machine_status == WORKING){        //*** Stop cycle ***
           main_form[START_STOP].val_format = START_ST;
           main_form[PLATEAU].val_format = OFF_ST;
           main_form[PEAK].val_format = OFF_ST;
           machine_status = STOP;
-          /* stop_breathe(); */
+          stop_breathe();
         }
         main_form[START_STOP].is_changed = true;
         main_form[PLATEAU].is_changed = true;
