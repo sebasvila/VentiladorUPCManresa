@@ -147,8 +147,10 @@ PT_THREAD(vaction_thread(struct pt *pt))
 
   PT_BEGIN(pt);
 
+  motor_disable();
+
   /* 
-   * breathe forever!!
+   * Breathe cycle
    */
   for(;;) {
     PT_WAIT_WHILE(pt, status != working);
