@@ -257,39 +257,6 @@ void buttons_init(void){
 
 
 /**
- * @brief Prints the whole current form to the lcd 
- */
-void print_form(void){
-  for (uint8_t i = 0; i < num_of_fields; i++) {
-    print_field(&form[i]);
-  }
-  is_form_changed = false;
-}
-
-
-/**
- * @brief Searches for the changed fields inside the current form and prints its values
- */
-void print_changed_fields(void){
-  for (uint8_t i = 0; i < num_of_fields; i++) {
-    if(form[i].is_selected){
-      if (is_blink_time()) {
-        blink_item_value(&form[i]);
-      } else if (is_unblink_time() | form[i].is_changed) {
-        print_field_new_value(&form[i]);
-        form[i].is_changed = false;    
-        reset_unblink_counter();
-      }
-    } else if (form[i].is_changed) {
-      print_field_value(&form[i]);
-      form[i].is_changed = false;
-      reset_unblink_counter();
-    }
-  }
-}
-
-
-/**
  * @brief Module setup. Initializes the display, buttons, encoder, and the ticker.
  */
 void UI_setup(void){
@@ -318,9 +285,26 @@ PT_THREAD(display_thread(struct pt *pt))
       lcd_clear(&l, true);
       reset_blink_counter();
       unselect_field();
-      print_form();
+      for (uint8_t i = 0; i < num_of_fields; i++) {
+	print_field(&form[i]);
+      }
+      is_form_changed = false;
     } else {
-      print_changed_fields();
+      for (uint8_t i = 0; i < num_of_fields; i++) {
+	if(form[i].is_selected){
+	  if (is_blink_time()) {
+	    blink_item_value(&form[i]);
+	  } else if (is_unblink_time() | form[i].is_changed) {
+	    print_field_new_value(&form[i]);
+	    form[i].is_changed = false;    
+	    reset_unblink_counter();
+	  }
+	} else if (form[i].is_changed) {
+	  print_field_value(&form[i]);
+	  form[i].is_changed = false;
+	  reset_unblink_counter();
+	}
+      }
     }
 
     update_blink_counter();
