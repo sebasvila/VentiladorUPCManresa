@@ -67,7 +67,6 @@ switch_t btn_enc;
 
 //Encoder
 encoder_t encoder;
-#define ENCODER_REFRESH_TIME 1
 
 
 /**
@@ -413,13 +412,11 @@ PT_THREAD(buttons_thread(struct pt *pt))
  **********************************************************************************/
 PT_THREAD(encoder_thread(struct pt *pt))
 {
-  static uint16_t chronos3;
   PT_BEGIN(pt);
 
   for(;;) {
-    chronos3 = ticker_get();
-    PT_WAIT_WHILE(pt, ticker_get() - chronos3 <= ENCODER_REFRESH_TIME);
     enc_update_position(&encoder);
+    PT_YIELD(pt);
   }
   PT_END(pt);
 }
