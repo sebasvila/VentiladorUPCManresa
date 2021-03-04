@@ -339,25 +339,31 @@ PT_THREAD(buttons_thread(struct pt *pt))
   // static uint16_t chronos2;
   PT_BEGIN(pt);
 
+  //Set default params
+  vaction_set_tr(main_form[VOLUME].value);
+  vaction_set_ie(main_form[RATIO].value * 10);
+  vaction_set_rr(main_form[FREQ].value * 10);
+
   for(;;) {
-    if (form_id == STARTING){
-      PT_DELAY(pt, 100); //To be changed. Simulates the homing seqüence
-      set_form(MAIN_SCREEN);
-    } else if (form_id == MAIN_SCREEN){
+    if (form_id == MAIN_SCREEN){
       //Volume button
       SWITCH_ON_CLICK(btn_1, select_field(VOLUME));
+      PT_YIELD(pt);
 
       //I:R button
       SWITCH_ON_CLICK(btn_2, select_field(RATIO));
+      PT_YIELD(pt);
       
       //Freq button
       SWITCH_ON_CLICK(btn_3, select_field(FREQ));
+      PT_YIELD(pt);
       
       //Encoder button
       SWITCH_ON_CLICK(btn_enc,
         save_selected_value();
         unselect_field()
       );
+      PT_YIELD(pt);
       
       //Start/stop button
       switch_poll(btn_start);
@@ -380,11 +386,18 @@ PT_THREAD(buttons_thread(struct pt *pt))
         main_form[PLATEAU].is_changed = true;
         main_form[PEAK].is_changed = true;   
       }
+      PT_YIELD(pt);
+
+      
       //Encoder rotation
-      if (get_position(&encoder) != 0){
-        change_value_selected_field(get_position(&encoder));
+      if (encoder.position != 0){
+        change_value_selected_field(encoder.position);
         reset_position(&encoder);
       }
+      PT_YIELD(pt);
+    } else if (form_id == STARTING){
+      PT_DELAY(pt, 100); //To be changed. Simulates the homing seqüence
+      set_form(MAIN_SCREEN);
     }
 
     if ((form_id == MAIN_SCREEN) | (form_id == MENU)){
