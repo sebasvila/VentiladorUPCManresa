@@ -16,7 +16,7 @@
 #include "vaction.h"
 
 
-#define REFRESH_TIME 50  //times the ticker freq (16ms)
+#define REFRESH_TIME 30  //times the ticker freq (16ms)
 
 
 //MACHINE STATUS
@@ -44,7 +44,9 @@ field_t *form = NULL;               /*!< A pointer to the current loaded form */
 uint8_t num_of_fields = 0;          /*!< Contains the number of fields contained on the loaded form */
 
 field_t *selected_field = NULL;     /*!< A pointer to the selected field */
-uint16_t new_selected_value = 0;
+uint16_t new_selected_value = 0;    /*!< The selected field modified value. When confirmed, it'll be saved to its field, otherwised discarded */
+char *ch;                           /*!< Pointer to the last sent char to the LCD
+
 
 /**
  * Buttons 
