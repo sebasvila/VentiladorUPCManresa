@@ -14,15 +14,14 @@ PLATFORM=ArduinoONE
 DEVICE=/dev/ttyACM0
 
 # program modules (file suffix not needed)
-SRC_MODS = main vaction
+SRC_MODS = main vaction ui blink
 
 # program tests/examples
 SRC_TESTS = test_rtc1307_1
 
 # Link rules for tests/examples (may have specific platform requirements to run)
 # any test depends on libaire
-main: vaction.o -laire -ldev
-
+main: vaction.o ui.o blink.o -ldev -laire
 
 ##### Internal configs ##########################################
 
