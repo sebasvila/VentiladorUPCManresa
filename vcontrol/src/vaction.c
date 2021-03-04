@@ -22,7 +22,7 @@ const float alpha = 2.0 * M_PI / 200;
 /* ramp up(down) fraction of total travel */
 const float ramp_frac = 0.2;
 /* max motor turns */
-const float max_turns = 4.0;
+const float max_turns = 5.0;
 /* expiratory lowering time (s) */
 const float exp_lowering_time = 0.7;
 
