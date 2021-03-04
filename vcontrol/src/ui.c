@@ -98,23 +98,30 @@ void set_form(uint8_t new_form_id) {
  * @brief   Prints the field's value (not the label)
  * @param   field The field to print its value
  */
-void print_field_value(field_t *field){
-  lcd_move_cursor(&l, field->value_col, field->value_row);
-  sprintf(value_ch, field->val_format, field->value);
-  lcd_print(&l, value_ch);
-}
+#define PRINT_FIELD_VALUE(field)					\
+  do {									\
+    lcd_move_cursor(&l, (field)->value_col, (field)->value_row);	\
+    sprintf(value_ch, (field)->val_format, (field)->value);		\
+    for (ch = value_ch; *ch; ch++) {					\
+      PT_WAIT_UNTIL(pt, l.i2c_comm == Success);				\
+      lcd_print_ch(&l, *ch);						\
+    };									\
+  } while (0)
 
 
 /**
  * @brief   Prints the field's new selected value (not the label)
  * @param   field The field to print its value
  */
-void print_field_new_value(field_t *field){
-  lcd_move_cursor(&l, field->value_col, field->value_row);
-  sprintf(value_ch, field->val_format, new_selected_value);
-  lcd_print(&l, value_ch);
-}
-
+#define PRINT_FIELD_NEW_VALUE(field)					\
+  do {									\
+    lcd_move_cursor(&l, (field)->value_col, (field)->value_row);	\
+    sprintf(value_ch, (field)->val_format, new_selected_value);		\
+    for (ch = value_ch; *ch; ch++) {					\
+      PT_WAIT_UNTIL(pt, l.i2c_comm == Success);				\
+      lcd_print_ch(&l, *ch);						\
+    };									\
+  } while (0)
 
 /**
  * @brief     Selects the given parameter and starts blinking it asynchronously and disables any other blinking parameter to make sure that just one is selected.
@@ -125,7 +132,7 @@ void select_field(uint8_t field_id) {
 
   //Previous selected field
   if (selected_field != NULL){
-    print_field_value(selected_field);
+    selected_field->is_changed = true; //To print the original value. Changes not accepted are discarded.
     selected_field->is_selected = false;
   }
 
@@ -184,21 +191,6 @@ void save_selected_value(){
     vaction_set_rr(selected_field->value * 10);
   }
 }
-
-
-/**
- * @brief Print the corresponding field to the lcd
- * 
- * @param field Pointer to the field 
- */
-void print_field(field_t *field){
-  lcd_move_cursor(&l, field->label_col,field->label_row);
-  lcd_print(&l, field->label);
-  if (field->value != 255){
-    print_field_value(field);
-  }
-}
-
 
 
 /**
@@ -277,30 +269,51 @@ void UI_setup(void){
 PT_THREAD(display_thread(struct pt *pt))
 {
   static uint16_t chronos;
+  static uint8_t i;
 
   PT_BEGIN(pt);
 
   for(;;) {
     if (is_form_changed) {
-      lcd_clear(&l, true);
+      lcd_clear(&l, false);
+      PT_DELAY(pt,1);       //To make sure lcd_clear is finished
       reset_blink_counter();
       unselect_field();
-      for (uint8_t i = 0; i < num_of_fields; i++) {
-	print_field(&form[i]);
+      for (i = 0; i < num_of_fields; i++) {
+	lcd_move_cursor(&l, form[i].label_col, form[i].label_row);
+	PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
+	for (ch = form[i].label; *ch; ch++) {
+	  lcd_print_ch(&l, *ch);
+	  PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
+	}
+	
+	if(form[i].value != 255){
+	  PRINT_FIELD_VALUE(&form[i]);
+	  PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
+	}
       }
       is_form_changed = false;
     } else {
-      for (uint8_t i = 0; i < num_of_fields; i++) {
+      for (i = 0; i < num_of_fields; i++) {
 	if(form[i].is_selected){
 	  if (is_blink_time()) {
-	    blink_item_value(&form[i]);
+	    lcd_move_cursor(&l, form[i].value_col, form[i].value_row);
+	    PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
+	    sprintf(value_ch, form[i].val_format, new_selected_value);
+	    for (ch = value_ch; *ch; ch++) {
+	      lcd_print_ch(&l, BLINKING_CHAR);
+	      PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
+	    }
+	    
 	  } else if (is_unblink_time() | form[i].is_changed) {
-	    print_field_new_value(&form[i]);
+	    PRINT_FIELD_NEW_VALUE(&form[i]);
+	    PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
 	    form[i].is_changed = false;    
 	    reset_unblink_counter();
 	  }
 	} else if (form[i].is_changed) {
-	  print_field_value(&form[i]);
+	  PRINT_FIELD_VALUE(&form[i]);
+	  PT_WAIT_UNTIL(pt, l.i2c_comm == Success);
 	  form[i].is_changed = false;
 	  reset_unblink_counter();
 	}
